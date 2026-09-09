@@ -3,6 +3,9 @@
 This file represents what I have learned about web programming.
 
 - [My startup](https://startup.cs260.click)
+
+I LOVE WEB PROGRAMMING
+
 - [My simon](https://simon.cs260.click)
 
 ## Helpful links
