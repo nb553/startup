@@ -44,12 +44,15 @@ sequenceDiagram
     Server->>Website: Syncs and updates
     Website->>You: Displays updated profile and recipe across profiles
 ```
-
+_Drew this up in figma_  
+ 
 ### Key features
 
 - **Personalized Allergy Profiles:** Custom configuration to meed vast medical needs and allergies rather than generic highlighters lumped into health apps.  
 - **Sync Households:** Multi-profile sharing that allows families to share allergen needs and collaborate instantly when meal planning.  
 - **Smart Ingredient and Search Engine:** Filters and flags ingregients and suggests substitutes safe across the household. Search third party public ingredient list for fast food or unknown packaged goods.  
+
+_Added key features of the application_  
 
 ### Technologies
 
