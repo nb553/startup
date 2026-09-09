@@ -1,8 +1,14 @@
-# Allergen Audit
+# Allergen Audit  
+ 
+ _Might change later, but so far I like this name_
+
 
 [My Notes](notes.md)
 
-Allergen Audit is a personalized allergen and dietary restrictions recipe manager. Majority of health apps have this feature in a mix of their rigid meal plans and weightloss focus, so it's ineffective when a person's allergies or diet doesn't match popular templates. This app lets users configure allergens and restrictions unique to a person and collaborate multi-person household profiles. The app will automatically flag allergens and suggest safe alternatives when adding a recipe, flag allergens of other household members, and break down unknown packaged foods by ingredients and nutritional facts.   
+Allergen Audit is a personalized allergen and dietary restrictions recipe manager. Majority of health apps have this feature in a mix of their rigid meal plans and weightloss focus, so it's ineffective when a person's allergies or diet doesn't match popular templates. This app lets users configure allergens and restrictions unique to a person and collaborate multi-person household profiles. The app will automatically flag allergens and suggest safe alternatives when adding a recipe, flag allergens of other household members, and break down unknown packaged foods by ingredients and nutritional facts.  
+ 
+ _A bare bones description of the application when I decided I wanted to do this, not as neat as the elevator pitch_
+
 
 > [!NOTE]
 > This is a template for your startup application. You must modify this `README.md` file for each phase of your development. You only need to fill in the section for each deliverable when that deliverable is submitted in Canvas. Without completing the section for a deliverable, the TA will not know what to look for when grading your submission. Feel free to add additional information to each deliverable description, but make sure you at least have the list of rubric items and a description of what you did for each item.
@@ -12,11 +18,13 @@ Allergen Audit is a personalized allergen and dietary restrictions recipe manage
 
 ### Elevator pitch
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Most health acts are too rigid and focused on mainstream diet plans to properly accommodate real world medical restrictions and allergies. This platform gives users the freedom to configure it to their individual allergy and medical profiles, manage household dietary needs in a collaboratory setting, filter recipes with subsitutions, and break down fast food items' ingredients on the go. This helps minimize frequent label checking and safe eating for all household members.  
+ 
+_Altered my description a bit to become a nicer elevator pitch_
 
 ### Design
 
-![Design image](placeholder.png)
+![alt text](image.png)  
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
@@ -35,14 +43,17 @@ sequenceDiagram
 
 ### Technologies
 
-I am going to use the required technologies in the following ways.
+I am going to use the required technologies in the following ways:
 
-- **HTML** - Description here
-- **CSS** - Description here
-- **React** - Description here
-- **Service** - Description here
-- **DB/Login** - Description here
-- **WebSocket** - Description here
+- **HTML** - This is where the structure comes in and the basic layout for navigating allergy profiles and recipe manager pages. 
+- **CSS** - The actual look of the interface. Visual indicators for various profile's allergens, clean and simple style, and a responsive interace for mobile and desktop. 
+- **React** - This manages the interactivity of the application. Easy user transition between main dashboard, household profiles, recipe editors, and fast food lookup. 
+- **Service** - Works in the background to look for third party ingredient lists, saving user preferences, and authentications. 
+- **DB/Login** - What will store all this data, including a profile's restrictions, save household members and their profiles, and save substitutions.
+- **WebSocket** - Real time connection when multiple household members adds a recipe, real time editing of substitutions.  
+ 
+ _Added these representations for the app. A lot of it is saving profiles, real time alerts and editing, and funneling public allergen menus for fast food and or brand products_
+
 
 ## 🚀 Specification Deliverable
 
