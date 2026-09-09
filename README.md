@@ -25,32 +25,42 @@ _Altered my description a bit to become a nicer elevator pitch_
 ### Design
 
 ![alt text](image.png)  
+![alt text](image-1.png)  
+![alt text](image-2.png)
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+The first image is just a rough sketch of what a household dashboard will look like. It deomonstrates how it will list out a recipe with their ingredients, and flag ingredients. If a food has a substitute, it will suggest an alternative that will be safe for the other household members. These are small simple recipes pulled from my actual family. For menudo my mom had to take out carrots and peas because of allergies. With the ice cream recipe she found substitutes that we still use today.  
+ 
+ The second image is also just a bare bones profile to show a user's profile with there allergies and other households they are a part of.  
+ 
+ The third image is the look up page if the user is out eating and needs to look up if a food is safe. If a packaged food is missing its label you can take a picture to search it, or manually search it and it will pull up the ingredients list. The bottom image is pulled from the Taco Bell allergen menu, so the application will quickly pull this up when searched. 
 
 ```mermaid
 sequenceDiagram
     actor You
     actor Website
-    You->>Website: Replace this with your design
+    actor Server
+    You->>Website: Updates allergy profile and recipe
+    Website->>Server: Sends WebSocket request with the new data updated
+    Server->>Website: Syncs and updates
+    Website->>You: Displays updated profile and recipe across profiles
 ```
 
 ### Key features
 
-- Describe your key feature
-- Describe your key feature
-- Describe your key feature
+- **Personalized Allergy Profiles:** Custom configuration to meed vast medical needs and allergies rather than generic highlighters lumped into health apps.  
+- **Sync Households:** Multi-profile sharing that allows families to share allergen needs and collaborate instantly when meal planning.  
+- **Smart Ingredient and Search Engine:** Filters and flags ingregients and suggests substitutes safe across the household. Search third party public ingredient list for fast food or unknown packaged goods.  
 
 ### Technologies
 
 I am going to use the required technologies in the following ways:
 
-- **HTML** - This is where the structure comes in and the basic layout for navigating allergy profiles and recipe manager pages. 
-- **CSS** - The actual look of the interface. Visual indicators for various profile's allergens, clean and simple style, and a responsive interace for mobile and desktop. 
-- **React** - This manages the interactivity of the application. Easy user transition between main dashboard, household profiles, recipe editors, and fast food lookup. 
-- **Service** - Works in the background to look for third party ingredient lists, saving user preferences, and authentications. 
+- **HTML** - This is where the structure comes in and the basic layout for navigating allergy profiles and recipe manager pages. There will be 4 pages: login, a main dashboard displaying your allergies and household, recipe manager, and lookup tools.
+- **CSS** - The actual look of the interface. Visual and contrasting indicators for various profile's allergens and substitutes, clean and simple style, and a responsive interace for mobile and desktop. 
+- **React** - This manages the interactivity of the application. Easy user transition between main dashboard, household profiles, recipe editors, and fast food lookup. Will handle login, profile and household setup, displaying other household members and their profiles. React to each other's profiles and substitutes. 
+- **Service** - Works in the background to look for third party ingredient lists, saving user preferences, authentications, updating profiles, filtering recipes with substitutes, managing household members. 
 - **DB/Login** - What will store all this data, including a profile's restrictions, save household members and their profiles, and save substitutions.
-- **WebSocket** - Real time connection when multiple household members adds a recipe, real time editing of substitutions.  
+- **WebSocket** - Real time connection when multiple household members adds a recipe, adds substitutes, or adds allergens to profile.   
  
  _Added these representations for the app. A lot of it is saving profiles, real time alerts and editing, and funneling public allergen menus for fast food and or brand products_
 
@@ -62,12 +72,12 @@ I am going to use the required technologies in the following ways:
 
 For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
 
-- [ ] I completed the prerequisites for this deliverable (Git commit requirement)
-- [ ] Proper use of Markdown
-- [ ] A concise and compelling elevator pitch
-- [ ] Description of key features
-- [ ] Description of how you will use each technology including your 3rd party API and use of WebSocket
-- [ ] One or more rough sketches of your application. Images must be embedded in this file using Markdown image references.
+- [X] I completed the prerequisites for this deliverable (Git commit requirement)
+- [X] Proper use of Markdown
+- [X] A concise and compelling elevator pitch
+- [X] Description of key features
+- [X] Description of how you will use each technology including your 3rd party API and use of WebSocket
+- [X] One or more rough sketches of your application. Images must be embedded in this file using Markdown image references.
 
 ## 🚀 AWS deliverable
 
