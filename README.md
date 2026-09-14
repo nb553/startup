@@ -86,9 +86,11 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 
 For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
 
-- [ ] **Rented EC2 server** - I did not complete this part of the deliverable.
-- [ ] **Leased domain name** - I did not complete this part of the deliverable.
-- [ ] **Server accessible** from my domain: [https://yourdomainnamehere.click](https://yourdomainnamehere.click) - I did not complete this part of the deliverable.
+- [X] **Rented EC2 server** - I did not complete this part of the deliverable.
+- [X] **Leased domain name** - I did not complete this part of the deliverable.
+- [X] **Server accessible** from my domain: [hhttps://burkart260webprogramming.click](https://burkart260webprogramming.click) - **Very original name lol**.
+
+_Finally got my domain and IP working after some time. I didn't realize how extensive it is to actually create a domain and all the components that go into it. But rn it works. If I do come across an issue I will reach out again_
 
 ## 🚀 HTML deliverable
 
