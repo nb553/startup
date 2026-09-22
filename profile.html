@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profile | Allergen Audit</title>
+    <link rel="icon" href="favicon.ico" />
+  </head>
+  <body>
+    <header>
+      <h1>Allergen Audit</h1>
+
+      <nav>
+        <menu>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="dashboard.html">Dashboard</a></li>
+          <li><a href="profile.html">Profile</a></li>
+          <li><a href="lookup.html">Lookup</a></li>
+        </menu>
+      </nav>
+
+      <hr />
+    </header>
+
+    <main>
+      <h2>My Profile</h2>
+
+      <!-- Database data placeholder: stored user profile info -->
+      <section>
+        <h3>Natasha Burkart</h3>
+        <p>tay2burkart728@gmail.com</p>
+
+        <h4>Allergens &amp; Restrictions</h4>
+        <ul>
+          <li>Peanuts &mdash; severe</li>
+          <li>Tree Nuts &mdash; severe</li>
+          <li>Legumes &mdash; severe</li>
+          <li>Chicken &mdash; severe</li>
+          <li>Carrots &mdash; severe</li>
+          <li>Chocolate &mdash; severe</li>
+          <li>Avocado &mdash; severe</li>
+        </ul>
+
+        <form>
+          <div>
+            <label for="new-allergen">Add allergen or restriction: </label>
+            <input type="text" id="new-allergen" name="newAllergen" placeholder="e.g. Dairy" />
+          </div>
+          <div>
+            <label for="severity">Severity: </label>
+            <select id="severity" name="severity">
+              <option>Mild</option>
+              <option>Moderate</option>
+              <option selected>Severe</option>
+              <option>Dietary preference</option>
+            </select>
+          </div>
+          <button type="submit">Save</button>
+        </form>
+      </section>
+
+      <!-- Database data placeholder: households the user belongs to -->
+      <section>
+        <h3>My Households</h3>
+
+        <article>
+          <h4>Burkart Family</h4>
+          <ul>
+            <li>Mom &mdash; lactose intolerant; allergic to soy, fruit</li>
+            <li>Dad &mdash; allergic to spices, turkey</li>
+            <li>Joe Jr &mdash; lactose intolerant; allergic to carrots</li>
+            <li>Abigail &mdash; no restrictions</li>
+            <li>Toby &mdash; allergic to cherries</li>
+            <li>Natasha (me) &mdash; allergric to peanuts, tree nuts, legumes, chicken, carrot, chocolate, avocado</li>
+          </ul>
+        </article>
+
+        <article>
+          <h4>Provo Apt</h4>
+          <ul>
+            <li>Grace &mdash; celiac</li>
+            <li>Elyse &mdash; celiac</li>
+            <li>Natasha (me) &mdash; allergric to peanuts, tree nuts, legumes, chicken, carrot, chocolate, avocado</li>
+          </ul>
+        </article>
+
+        <form>
+          <div>
+            <label for="household-code">Join a household: </label>
+            <input type="text" id="household-code" name="householdCode" placeholder="Invite code" />
+          </div>
+          <button type="submit">Join</button>
+        </form>
+      </section>
+    </main>
+
+    <footer>
+      <hr />
+      <span>Natasha Burkart</span>
+      <br />
+      <a href="https://github.com/nb553/startup">GitHub</a>
+    </footer>
+  </body>
+</html>

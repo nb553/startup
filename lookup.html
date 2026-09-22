@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lookup | Allergen Audit</title>
+    <link rel="icon" href="favicon.ico" />
+  </head>
+  <body>
+    <header>
+      <h1>Allergen Audit</h1>
+
+      <nav>
+        <menu>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="dashboard.html">Dashboard</a></li>
+          <li><a href="profile.html">Profile</a></li>
+          <li><a href="lookup.html">Lookup</a></li>
+        </menu>
+      </nav>
+
+      <hr />
+    </header>
+
+    <main>
+      <h2>Food Lookup</h2>
+      <p>Search a packaged or restaurant food item, or snap a photo of its label if one isn't available.</p>
+
+      <!-- 3rd-party service call placeholder: manual search -->
+      <section>
+        <h3>Search by name</h3>
+        <form>
+          <div>
+            <label for="food-search">Food or restaurant item: </label>
+            <input type="search" id="food-search" name="foodSearch" placeholder="e.g. Taco Bell Crunchy Taco" />
+          </div>
+          <button type="submit">Search</button>
+        </form>
+      </section>
+
+      <!-- 3rd-party service call placeholder: photo scan -->
+      <section>
+        <h3>Scan a label</h3>
+        <form>
+          <label for="label-photo">Take or upload a photo of the packaging: </label>
+          <input type="file" id="label-photo" name="labelPhoto" accept="image/*" capture="environment" />
+          <button type="submit">Scan</button>
+        </form>
+      </section>
+
+      <!-- Application data placeholder: search result -->
+      <section>
+        <h3>Result: Taco Bell Crunchy Taco</h3>
+        <table>
+          <tr>
+            <th>Ingredient</th>
+            <th>Allergen flag</th>
+          </tr>
+          <tr>
+            <td>Seasoned beef</td>
+            <td>None</td>
+          </tr>
+          <tr>
+            <td>Iceberg lettuce</td>
+            <td>None</td>
+          </tr>
+          <tr>
+            <td>Cheddar cheese</td>
+            <td><b>Dairy</b> &mdash; flagged (Mom) (Joe Jr)</td>
+          </tr>
+          <tr>
+            <td>Crunchy taco shell</td>
+            <td><b>Wheat/Gluten</td>
+          </tr>
+        </table>
+        <p>Not safe for: Mom, Joe Jr. Suggested substitute:  no cheese.</p>
+      </section>
+    </main>
+
+    <footer>
+      <hr />
+      <span>Natasha Burkart</span>
+      <br />
+      <a href="https://github.com/nb553/startup">GitHub</a>
+    </footer>
+  </body>
+</html>

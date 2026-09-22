@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard | Allergen Audit</title>
+    <link rel="icon" href="favicon.ico" />
+  </head>
+  <body>
+    <header>
+      <h1>Allergen Audit</h1>
+
+      <nav>
+        <menu>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="dashboard.html">Dashboard</a></li>
+          <li><a href="profile.html">Profile</a></li>
+          <li><a href="lookup.html">Lookup</a></li>
+        </menu>
+      </nav>
+
+      <hr />
+    </header>
+
+    <main>
+      <h2>Household Dashboard</h2>
+      <p>Logged in as <span id="username">Natasha</span> &mdash; Household: <span id="household-name">Burkart Family</span></p>
+
+      <!-- Application data placeholder: recipes with flagged ingredients and substitutes -->
+      <section>
+        <h3>Recipes</h3>
+
+        <article>
+          <h4>Menudo</h4>
+          <ul>
+            <li>Menudo seasoning</li>
+            <li>Ground beef</li>
+            <li>Onion</li>
+            <li>Garlic</li>
+            <li><b>Carrots</b> &mdash; flagged: allergic (you) (Joe Jr)</li>
+            <li><b>Peas</b> &mdash; flagged: allergic (you)</li>
+          </ul>
+          <p>Suggested substitute: omit carrots and peas &mdash; safe for all household members.</p>
+        </article>
+
+        <article>
+          <h4>Homemade Ice Cream</h4>
+          <ul>
+            <li>Heavy cream</li>
+            <li><b>Whole milk</b> &mdash; flagged: lactose intolerant (Mom) (Joe Jr)</li>
+            <li>Sugar</li>
+            <li>Vanilla extract</b> &mdash; flagged: allergic (you) </li>
+          </ul>
+          <p>Suggested substitute: replace whole milk with oat milk, replace vanilla extract with black sugar syrup &mdash; safe for all household members.</p>
+        </article>
+
+        <article>
+          <h4>Add a new recipe</h4>
+          <form>
+            <div>
+              <label for="recipe-name">Recipe name: </label>
+              <input type="text" id="recipe-name" name="recipeName" placeholder="e.g. Tacos" />
+            </div>
+            <div>
+              <label for="recipe-ingredients">Ingredients: </label>
+              <textarea id="recipe-ingredients" name="recipeIngredients" placeholder="One ingredient per line"></textarea>
+            </div>
+            <button type="submit">Check for allergens</button>
+          </form>
+        </article>
+      </section>
+
+      <!-- WebSocket data placeholder: live household activity -->
+      <aside>
+        <h3>Household Activity</h3>
+        <ul id="activity-feed">
+          <li>Toby flagged cherries in a new recipe.</li>
+          <li>Abigail added a substitute for Ice cream.</li>
+          <li>Natasha joined the Burkart Family household.</li>
+        </ul>
+      </aside>
+    </main>
+
+    <footer>
+      <hr />
+      <span>Your Name</span>
+      <br />
+      <a href="https://github.com/nb553/startup">GitHub</a>
+    </footer>
+  </body>
+</html>
