@@ -97,15 +97,15 @@ _Finally got my domain and IP working after some time. I didn't realize how exte
 For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
 
 - [X] I completed the prerequisites for this deliverable (Simon deployed, GitHub link, Git commits)
-- [X] **HTML pages** - I did not complete this part of the deliverable.
-- [X] **Proper HTML element usage** - I did not complete this part of the deliverable.
-- [X] **Links** - I did not complete this part of the deliverable.
-- [X] **Text** - I did not complete this part of the deliverable.
-- [X] **3rd party API placeholder** - I did not complete this part of the deliverable.
-- [X] **Images** - I did not complete this part of the deliverable.
-- [X] **Login placeholder** - I did not complete this part of the deliverable.
-- [X] **DB data placeholder** - I did not complete this part of the deliverable.
-- [X] **WebSocket placeholder** - I did not complete this part of the deliverable.
+- [X] **HTML pages** - I made 4 pages at first, then at a 5th to actually create an account
+- [X] **Proper HTML element usage** 
+- [X] **Links** 
+- [X] **Text**
+- [X] **3rd party API placeholder** 
+- [X] **Images** Found images and just saved it to my repo
+- [X] **Login placeholder** 
+- [X] **DB data placeholder** 
+- [X] **WebSocket placeholder** 
 
 ## 🚀 CSS deliverable
 

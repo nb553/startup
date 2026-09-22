@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Allergen Audit</title>
+    <title>Create Account | Allergen Audit</title>
     <link rel="icon" href="favicon.ico" />
   </head>
   <body>
@@ -23,36 +23,33 @@
     </header>
 
     <main>
-      <h2>Track allergens. Cook safely. Eat anywhere.</h2>
-      <p>
-        Allergen Audit helps you and your household manage individual allergens
-        and dietary restrictions, flag those needs in recipes, and check
-        packaged or fast food items on the go.
-      </p>
+      <h2>Create Your Account</h2>
 
       <!-- Authentication placeholder -->
       <form method="get" action="dashboard.html">
         <div>
+          <label for="full-name">Full name</label>
+          <input type="text" id="full-name" name="vFullName" placeholder="Your name" required />
+        </div>
+        <div>
           <label for="email">Email</label>
-          <span>@</span>
-          <input type="text" id="email" name="vEmail" placeholder="your@email.com" />
+          <input type="email" id="email" name="vEmail" placeholder="your@email.com" required />
         </div>
         <div>
           <label for="password">Password</label>
-          <span>🔒</span>
-          <input type="password" id="password" name="vPassword" placeholder="password" />
+          <input type="password" id="password" name="vPassword" placeholder="password" required />
         </div>
-        <button type="submit">Login</button>
+        <button type="submit">Create Account</button>
       </form>
- 
-      <p>New here? <a href="register.html">Create an account</a>.</p>
+
+      <p>Already have an account? <a href="index.html">Log in</a>.</p>
     </main>
 
     <footer>
       <hr />
-      <span>Natasha Burkart</span>
+      <span>Your Name</span>
       <br />
-      <a href="https://github.com/nb553/startup">GitHub</a>
+      <a href="https://github.com/YOUR_USERNAME/YOUR_REPO">GitHub</a>
     </footer>
   </body>
 </html>
