@@ -12,12 +12,12 @@
       <p>Logged in as <b id="username">Natasha Burkart</b></p>
 
       <nav>
-        <menu>
+        <ul>
           <li><a href="index.html">Home</a></li>
           <li><a href="dashboard.html">Dashboard</a></li>
           <li><a href="profile.html">Profile</a></li>
           <li><a href="lookup.html">Lookup</a></li>
-        </menu>
+        </ul>
       </nav>
 
       <hr />
@@ -44,22 +44,24 @@
         </ul>
 
         <form>
-          <div>
-            <label for="new-allergen">Add allergen or restriction: </label>
-            <input type="text" id="new-allergen" name="newAllergen" placeholder="e.g. Dairy" />
-          </div>
-          <div>
-            <label for="severity">Severity: </label>
-            <select id="severity" name="severity">
-              <option>Mild</option>
-              <option>Moderate</option>
-              <option selected>Severe</option>
-              <option>Dietary preference</option>
-            </select>
-          </div>
-          <button type="submit">Save</button>
+            <fieldset>
+                <legend>Add an allergen or restriction</legend>
+                <div>
+                    <label for="new-allergen">Add allergen or restriction: </label>
+                    <input type="text" id="new-allergen" name="newAllergen" placeholder="e.g. Dairy" />
+                </div>
+                <div>
+                    <label for="severity">Severity: </label>
+                    <select id="severity" name="severity">
+                        <option>Mild</option>
+                        <option>Moderate</option>
+                        <option selected>Severe</option>
+                        <option>Dietary preference</option>
+                    </select>
+                </div>
+            </fieldset>
+            <button type="submit">Save</button>
         </form>
-      </section>
 
       <!-- Database data placeholder: households the user belongs to -->
       <section>
