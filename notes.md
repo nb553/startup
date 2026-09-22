@@ -2,11 +2,11 @@
 
 This file represents what I have learned about web programming.
 
-- [My startup](https://startup.cs260.click)
+- [My startup](https://github.com/nb553/startup)
 
 I LOVE WEB PROGRAMMING
 
-- [My simon](https://simon.cs260.click)
+- [My simon](https://simon.burkart260webprogramming.click)
 
 ## Helpful links
 
