@@ -98,14 +98,14 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 
 - [X] I completed the prerequisites for this deliverable (Simon deployed, GitHub link, Git commits)
 - [X] **HTML pages** - I made 4 pages at first, then at a 5th to actually create an account
-- [X] **Proper HTML element usage** 
-- [X] **Links** 
-- [X] **Text**
-- [X] **3rd party API placeholder** 
-- [X] **Images** Found images and just saved it to my repo
-- [X] **Login placeholder** 
-- [X] **DB data placeholder** 
-- [X] **WebSocket placeholder** 
+- [X] **Proper HTML element usage** - Used header, nav, main, section, article, aside, and footer
+- [X] **Links** - Nav menu on every page links to all other pages when needed
+- [X] **Text** - - Home page pitch, recipe descriptions, allergy lists, and lookup results all have real content to match my actual roommates and family
+- [X] **3rd party API placeholder** - Search form and photo-upload input on the lookup page
+- [X] **Images** - Found images and just saved it to my repo
+- [X] **Login placeholder** - Login form on the home page, plus a separate account creation page
+- [X] **DB data placeholder** - Profile allergy list and household member data
+- [X] **WebSocket placeholder** - Household activity feed on the dashboard
 
 ## 🚀 CSS deliverable
 
