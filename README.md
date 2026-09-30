@@ -111,13 +111,13 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 
 For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
 
-- [ ] I completed the prerequisites for this deliverable (Simon deployed, GitHub link, Git commits)
-- [ ] **Visually appealing colors and layout. No overflowing elements.** - I did not complete this part of the deliverable.
-- [ ] **Use of a CSS framework** - I did not complete this part of the deliverable.
-- [ ] **All visual elements styled using CSS** - I did not complete this part of the deliverable.
-- [ ] **Responsive to window resizing using flexbox and/or grid display** - I did not complete this part of the deliverable.
-- [ ] **Use of a imported font** - I did not complete this part of the deliverable.
-- [ ] **Use of different types of selectors including element, class, ID, and pseudo selectors** - I did not complete this part of the deliverable.
+- [X] I completed the prerequisites for this deliverable (Simon deployed, GitHub link, Git commits)
+- [X] **Visually appealing colors and layout. No overflowing elements.** - Used a custom navy/teal/cream/coral/yellow palette across the whole app; images and tables are capped with max-width and tables scroll horizontally instead of overflowing on small screens.
+- [X] **Use of a CSS framework** - Used Tailwind CSS via the CDN script for layout, spacing, and responsive utility classes on every page.
+- [X] **All visual elements styled using CSS** - Every page shares a consistent look through main.css and Tailwind classes: cards, buttons, nav, forms, and tables all styled, not left as raw browser defaults.
+- [X] **Responsive to window resizing using flexbox and/or grid display** - Header/footer use flex to stack on narrow screens and go horizontal on wider ones; recipe cards, household cards, and lookup results use CSS grid that reflows from 1 to 3 columns depending on screen width.
+- [X] **Use of a imported font** - Imported Playfair Display (headings) and Nunito (body text) from Google Fonts via @import in main.css.
+- [X] **Use of different types of selectors including element, class, ID, and pseudo selectors** - Element selectors (body, h1-h4), class selectors (.flagged, .flagged-caution, .card, .btn-primary), an ID selector (#activity-feed), and pseudo selectors (:hover, :focus-visible, :invalid) are all used in main.css.
 
 ## 🚀 React part 1: Routing deliverable
 

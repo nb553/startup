@@ -4,107 +4,156 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Profile | Allergen Audit</title>
+    <meta name="description" content="Allergen Audit: Personalized allergen and dietary restriction management for households." />
     <link rel="icon" href="favicon.ico" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="main.css" />
   </head>
-  <body>
-    <header>
-      <h1>Allergen Audit</h1>
-      <p>Logged in as <b id="username">Natasha Burkart</b></p>
-
+  <body class="min-h-screen flex flex-col">
+    <header class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 p-4 md:px-8 bg-[var(--navy)] border-b-4 border-[var(--teal)]">
+      <div>
+        <h1 class="text-2xl md:text-3xl text-white italic">Allergen Audit</h1>
+        <p class="text-sm text-white/80">Logged in as <b id="username" class="text-white">Natasha Burkart</b></p>
+      </div>
       <nav>
-        <ul>
+        <ul class="flex flex-wrap gap-4 list-none p-0 m-0">
           <li><a href="index.html">Home</a></li>
           <li><a href="dashboard.html">Dashboard</a></li>
-          <li><a href="profile.html" class="active">Profile</a></li>
+          <li><a href="profile.html" class="current-page">Profile</a></li>
           <li><a href="lookup.html">Lookup</a></li>
-          <li><a href="register.html">Register</a></li>
         </ul>
       </nav>
-
-      <hr />
     </header>
 
-    <main>
-      <h2>My Profile</h2>
+    <main class="flex-1 max-w-4xl mx-auto w-full p-4 md:p-8 flex flex-col gap-8">
+      <h2 class="text-xl md:text-2xl">My Profile</h2>
 
       <!-- Database data placeholder: stored user profile info -->
-      <section>
-        <img src="profile.png" alt="Natasha Burkart's profile picture" width="150" />
-        <h3>Natasha Burkart</h3>
-        <p>tay2burkart728@gmail.com</p>
+      <section class="card flex flex-col sm:flex-row gap-4 items-start">
+        <img src="profile.png" alt="Natasha Burkart's profile picture" class="rounded-full w-28 h-28 object-cover" />
+        <div class="flex-1 flex flex-col gap-2">
+          <h3 class="text-lg font-bold">Natasha Burkart</h3>
+          <p>tay2burkart728@gmail.com</p>
 
-        <h4>Allergens &amp; Restrictions</h4>
-        <ul>
-          <li>Peanuts &mdash; severe</li>
-          <li>Tree Nuts &mdash; severe</li>
-          <li>Legumes &mdash; severe</li>
-          <li>Chicken &mdash; severe</li>
-          <li>Carrots &mdash; severe</li>
-          <li>Chocolate &mdash; severe</li>
-          <li>Avocado &mdash; severe</li>
-        </ul>
+          <h4 class="font-bold">Allergens &amp; Restrictions</h4>
+          <ul class="list-disc list-inside">
+            <li><span class="flagged">Peanuts</span> &mdash; severe</li>
+            <li><span class="flagged">Treenuts</span> &mdash; severe</li>
+            <li><span class="flagged">Legumes</span> &mdash; severe</li>
+            <li><span class="flagged">Chocolate</span> &mdash; severe</li>
+            <li><span class="flagged">Carrots</span> &mdash; severe</li>
+            <li><span class="flagged">Chicken</span> &mdash; severe</li>
+          </ul>
 
-        <form>
-            <fieldset>
-                <legend>Add an allergen or restriction</legend>
-                <div>
-                    <label for="new-allergen">Add allergen or restriction: </label>
-                    <input type="text" id="new-allergen" name="newAllergen" placeholder="e.g. Dairy" />
-                </div>
-                <div>
-                    <label for="severity">Severity: </label>
-                    <select id="severity" name="severity">
-                        <option>Mild</option>
-                        <option>Moderate</option>
-                        <option selected>Severe</option>
-                        <option>Dietary preference</option>
-                    </select>
-                </div>
+          <form class="flex flex-col gap-2 max-w-sm">
+            <fieldset class="border border-[var(--navy)]/20 rounded p-3 flex flex-col gap-2">
+              <legend class="px-1 font-bold">Add an allergen or restriction</legend>
+              <div class="flex flex-col gap-1">
+                <label for="new-allergen">Add allergen or restriction</label>
+                <input type="text" id="new-allergen" name="newAllergen" placeholder="e.g. Dairy" class="border border-[var(--navy)]/20 rounded px-2 py-1" />
+              </div>
+              <div class="flex flex-col gap-1">
+                <label for="severity">Severity</label>
+                <select id="severity" name="severity" class="border border-[var(--navy)]/20 rounded px-2 py-1">
+                  <option>Mild</option>
+                  <option>Moderate</option>
+                  <option selected>Severe</option>
+                  <option>Dietary preference</option>
+                </select>
+              </div>
             </fieldset>
-            <button type="submit">Save</button>
-        </form>
+            <button type="submit" class="btn-primary self-start">Save</button>
+          </form>
+        </div>
+      </section>
+
+               <legend class="px-1 font-bold">Add a nutrition goal</legend>
+              <div class="flex flex-col gap-1">
+                <label for="nutrient">Nutrient</label>
+                <select id="nutrient" name="nutrient" class="border border-[var(--navy)]/20 rounded px-2 py-1">
+                  <option>Sodium (mg)</option>
+                  <option>Calories (kcal)</option>
+                  <option>Protein (g)</option>
+                  <option>Sugar (g)</option>
+                </select>
+              </div>
+              <div class="flex flex-col gap-1">
+                <label for="goal-type">Goal type</label>
+                <select id="goal-type" name="goalType" class="border border-[var(--navy)]/20 rounded px-2 py-1">
+                  <option>Minimum needed per day</option>
+                  <option selected>Maximum limit per day</option>
+                </select>
+              </div>
+              <div class="flex flex-col gap-1">
+                <label for="goal-amount">Amount</label>
+                <input type="number" id="goal-amount" name="goalAmount" placeholder="e.g. 2400" required class="border border-[var(--navy)]/20 rounded px-2 py-1" />
+              </div>
+            </fieldset>
+            <button type="submit" class="btn-secondary self-start">Save Goal</button>
+          </form>
+        </div>
+      </section>
 
       <!-- Database data placeholder: households the user belongs to -->
-      <section>
-        <h3>My Households</h3>
+      <section class="flex flex-col gap-4">
+        <h3 class="text-lg font-bold">My Households</h3>
 
-        <article>
-          <h4>Burkart Family</h4>
-          <ul>
-            <li>Mom &mdash; lactose intolerant; allergic to soy, fruit</li>
-            <li>Dad &mdash; allergic to spices, turkey</li>
-            <li>Joe Jr &mdash; lactose intolerant; allergic to carrots</li>
-            <li>Abigail &mdash; no restrictions</li>
-            <li>Toby &mdash; allergic to cherries</li>
-            <li>Natasha (me) &mdash; allergic to peanuts, tree nuts, legumes, chicken, carrot, chocolate, avocado</li>
-          </ul>
-        </article>
-      </section>  
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <article class="card">
+            <h4 class="font-bold mb-2">Burkart Family</h4>
+            <ul class="list-disc list-inside">
+              <li>Mom &mdash; lactose intolerant</li>
+              <li>Dad &mdash; allergic to Mama Sita's menudo mix</li>
+              <li>Joe Jr &mdash; allergic to carrots, lactose intolerant</li>
+              <li>Abigail &mdash; gluten sensitive</li>
+              <li>Toby &mdash; tree nut allergy</li>
+              <li>Natasha (me) &mdash; allergic to peanuts, treenuts, legumes, chocolate, carrots, chicken</li>
+            </ul>
+          </article>
 
-        <article>
-          <h4>Provo Apt</h4>
-          <ul>
-            <li>Grace &mdash; celiac</li>
-            <li>Elyse &mdash; celiac</li>
-            <li>Natasha (me) &mdash; allergic to peanuts, tree nuts, legumes, chicken, carrot, chocolate, avocado</li>
-          </ul>
-        </article>
+          <article class="card">
+            <h4 class="font-bold mb-2">Provo Apt</h4>
+            <ul class="list-disc list-inside">
+              <li>Grace &mdash; vegetarian</li>
+              <li>Elyse &mdash; dairy allergy</li>
+              <li>Natasha (me) &mdash; allergic to peanuts, treenuts, legumes, chocolate, carrots, chicken</li>
+            </ul>
+          </article>
 
-        <form>
-          <div>
-            <label for="household-code">Join a household: </label>
-            <input type="text" id="household-code" name="householdCode" placeholder="Invite code" />
-          </div>
-          <button type="submit">Join</button>
-        </form>
+          <article class="card">
+            <h4 class="font-bold mb-2">Peaks Ice Arena</h4>
+            <ul class="list-disc list-inside">
+              <li>Natasha (me) &mdash; allergic to peanuts, treenuts, legumes, chocolate, carrots, chicken</li>
+              <li>Mira Jensen &mdash; vegan (dietary preference)</li>
+              <li>Lucy Breen &mdash; needs at least 2,400mg sodium/day (6g salt)</li>
+              <li>Brenda Juarez &mdash; no restrictions</li>
+              <li>Abby Wischmeier &mdash; calorie goal ~2,800 kcal/day</li>
+            </ul>
+          </article>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <form class="card flex flex-col gap-2">
+            <h4 class="font-bold">Create a household</h4>
+            <label for="household-name-input">Household name</label>
+            <input type="text" id="household-name-input" name="householdName" placeholder="e.g. Smith Family" class="border border-[var(--navy)]/20 rounded px-2 py-1" />
+            <button type="submit" class="btn-primary self-start">Create</button>
+          </form>
+
+          <form class="card flex flex-col gap-2">
+            <h4 class="font-bold">Join a household</h4>
+            <label for="household-code">Invite code</label>
+            <input type="text" id="household-code" name="householdCode" placeholder="Invite code" class="border border-[var(--navy)]/20 rounded px-2 py-1" />
+            <button type="submit" class="btn-secondary self-start">Join</button>
+          </form>
+        </div>
       </section>
     </main>
 
-    <footer>
-      <hr />
+    <footer class="p-4 bg-[var(--navy)] border-t-4 border-[var(--teal)] text-center text-white">
       <span>Natasha Burkart</span>
       <br />
-      <a href="https://github.com/nb553/startup">GitHub</a>
+      <a href="https://github.com/nb553/startup" class="text-[var(--teal)] underline">GitHub</a>
     </footer>
   </body>
 </html>

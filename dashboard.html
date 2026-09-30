@@ -4,92 +4,123 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dashboard | Allergen Audit</title>
+    <meta name="description" content="Allergen Audit: Personalized allergen and dietary restriction management for households." />
     <link rel="icon" href="favicon.ico" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="main.css" />
   </head>
-  <body>
-    <header>
-      <h1>Allergen Audit</h1>
-      <p>Logged in as <b id="username">Natasha Burkart</b></p>
-
+  <body class="min-h-screen flex flex-col">
+    <header class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 p-4 md:px-8 bg-[var(--navy)] border-b-4 border-[var(--teal)]">
+      <div>
+        <h1 class="text-2xl md:text-3xl text-white italic">Allergen Audit</h1>
+        <p class="text-sm text-white/80">Logged in as <b id="username" class="text-white">Natasha Burkart</b></p>
+      </div>
       <nav>
-        <ul>
+        <ul class="flex flex-wrap gap-4 list-none p-0 m-0">
           <li><a href="index.html">Home</a></li>
-          <li><a href="dashboard.html" class="active">Dashboard</a></li>
+          <li><a href="dashboard.html" class="current-page">Dashboard</a></li>
           <li><a href="profile.html">Profile</a></li>
           <li><a href="lookup.html">Lookup</a></li>
-          <li><a href="register.html">Register</a></li>
         </ul>
       </nav>
-
-      <hr />
     </header>
 
-    <main>
-      <h2>Household Dashboard</h2>
-      <p>Logged in as <span id="display-name">Natasha</span> &mdash; Household: <span id="household-name">Burkart Family</span></p>
+    <main class="flex-1 max-w-5xl mx-auto w-full p-4 md:p-8 flex flex-col gap-8">
+      <div>
+        <h2 class="text-xl md:text-2xl">Household Dashboard</h2>
+        <p class="italic">Household: <span id="household-name">Burkart Family</span></p>
+      </div>
 
       <!-- Application data placeholder: recipes with flagged ingredients and substitutes -->
-      <section>
-        <h3>Recipes</h3>
+      <section class="flex flex-col gap-4">
+        <h3 class="text-lg font-bold">Recipes</h3>
 
-        <article>
-          <h4>Menudo</h4>
-          <img src="menudo.png" alt="Bowl of filipino beef menudo" width="300" height="200" />
-          <ul>
-            <li>Menudo seasoning</li>
-            <li>Ground beef</li>
-            <li>Onion</li>
-            <li>Garlic</li>
-            <li><strong>Carrots</strong> &mdash; flagged: allergic (you) (Joe Jr)</li>
-            <li><strong>Peas</strong> &mdash; flagged: allergic (you)</li>
-          </ul>
-          <p>Suggested substitute: omit carrots and peas &mdash; safe for all household members.</p>
-        </article>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <article class="card flex flex-col gap-2">
+            <h4 class="font-bold">Menudo</h4>
+            <img src="menudo.png" alt="Bowl of menudo soup" class="rounded w-full h-40 object-cover" />
+            <ul class="list-disc list-inside">
+              <li><span class="flagged">Mama Sita's Menudo Mix</span> &mdash; allergic (Dad)</li>
+              <li>Ground Beef</li>
+              <li>Onion</li>
+              <li>Garlic</li>
+              <li><span class="flagged">Carrots</span> &mdash; allergic (Joe, me)</li>
+              <li><span class="flagged">Peas</span> &mdash; allergic (me)</li>
+            </ul>
+            <p class="substitute">Omit carrots and peas &mdash; safe for all household members.</p>
+            <p class="substitute">Replace Mama Sita's menudo mix with beef buillion &mdash; safe for all household members.</p>
 
-        <article>
-          <h4>Homemade Ice Cream</h4>
-          <img src="icecream.png" alt="Ninja's homemade ice cream recipe" width="300" height="200" />
-          <ul>
-            <li>Heavy cream</li>
-            <li><strong>Whole milk</strong> &mdash; flagged: lactose intolerant (Mom) (Joe Jr)</li>
-            <li>Sugar</li>
-            <li><strong>Vanilla extract</strong> &mdash; flagged: allergic (you) </li>
-          </ul>
-          <p>Suggested substitute: replace whole milk with oat milk, replace vanilla extract with black sugar syrup &mdash; safe for all household members.</p>
-        </article>
-
-        <article>
-          <h4>Add a new recipe</h4>
-          <form method="post" action="#">
-            <div>
-              <label for="recipe-name">Recipe name: </label>
-              <input type="text" id="recipe-name" name="recipeName" placeholder="e.g. Tacos" />
+            <div class="mt-2 pt-2 border-t border-[var(--navy)]/10">
+              <p class="font-bold text-sm">Nutrition (per serving)</p>
+              <ul class="text-sm list-disc list-inside">
+                <li>Sodium: <span class="flagged-caution">810mg</span> &mdash; contributes toward Lucy Breen's 2,400mg/day sodium need</li>
+                <li>Calories: 320</li>
+                <li>Protein: 24g</li>
+              </ul>
             </div>
-            <div>
-              <label for="recipe-ingredients">Ingredients: </label>
-              <textarea id="recipe-ingredients" name="recipeIngredients" placeholder="One ingredient per line"></textarea>
+          </article>
+
+          <article class="card flex flex-col gap-2">
+            <h4 class="font-bold">Homemade Ice Cream</h4>
+            <img src="icecream.png" alt="Bowl of homemade ice cream" class="rounded w-full h-40 object-cover" />
+            <ul class="list-disc list-inside">
+              <li>Heavy cream</li>
+              <li><span class="flagged-caution">Whole milk</span> &mdash; lactose intolerant (Mom, Joe)</li>
+              <li>Sugar</li>
+              <li><span class="flagged">Vanilla extract</span> &mdash; allergic (me)</li>
+            </ul>
+            <p class="substitute">Replace whole milk with lactaid milk &mdash; safe for all household members.</p>
+            <p class="substitute">Replace vanilla extract with black sugar syrup &mdash; safe for all household members.</p>
+
+            <div class="mt-2 pt-2 border-t border-[var(--navy)]/10">
+              <p class="font-bold text-sm">Nutrition (per serving)</p>
+              <ul class="text-sm list-disc list-inside">
+                <li>Sodium: 40mg &mdash; contributes toward Lucy Breen's 2,400mg/day sodium need</li>
+                <li>Calories: 270</li>
+                <li>Sugar: 22g</li>
+              </ul>
             </div>
-            <button type="submit">Check for allergens</button>
-          </form>
-        </article>
+          </article>
+
+          <article class="card flex flex-col gap-3">
+            <h4 class="font-bold">Add a new recipe</h4>
+            <form class="flex flex-col gap-2">
+              <div class="flex flex-col gap-1">
+                <label for="recipe-name">Recipe name</label>
+                <input type="text" id="recipe-name" name="recipeName" placeholder="e.g. Tacos" class="border border-[var(--navy)]/20 rounded px-2 py-1" />
+              </div>
+              <div class="flex flex-col gap-1">
+                <label for="recipe-ingredients">Ingredients</label>
+                <textarea id="recipe-ingredients" name="recipeIngredients" placeholder="One ingredient per line" required class="border border-[var(--navy)]/20 rounded px-2 py-1"></textarea>
+              </div>
+              <button type="submit" class="btn-primary self-start">Check for allergens</button>
+            </form>
+          </article>
+        </div>
+      </section>
+
+      <!-- Database data placeholder: combined nutrition totals against a member's daily need -->
+      <section class="card flex flex-col gap-2">
+        <h3 class="text-lg font-bold">Today's Sodium Total &mdash; Lucy Breen (Peaks Ice Arena)</h3>
+        <p>Menudo (810mg) + Ice Cream (40mg) = <span class="flagged-caution">850mg</span> toward her 2,400mg/day need</p>
+        <p class="substitute">Still needs 1,550mg more sodium today to meet her goal.</p>
       </section>
 
       <!-- WebSocket data placeholder: live household activity -->
-      <aside>
-        <h3>Household Activity</h3>
-        <ul id="activity-feed">
-          <li>Toby flagged cherries in a new recipe.</li>
-          <li>Abigail added a substitute for Ice cream.</li>
+      <aside id="activity-feed" class="p-4">
+        <h3 class="text-lg font-bold mb-2">Household Activity</h3>
+        <ul class="list-disc list-inside">
+          <li>Mom flagged <span class="flagged-caution">Whole Milk</span> in a new recipe.</li>
+          <li>Dad added a substitute for Menudo.</li>
           <li>Natasha joined the Burkart Family household.</li>
         </ul>
       </aside>
     </main>
 
-    <footer>
-      <hr />
+    <footer class="p-4 bg-[var(--navy)] border-t-4 border-[var(--teal)] text-center text-white">
       <span>Natasha Burkart</span>
       <br />
-      <a href="https://github.com/nb553/startup">GitHub</a>
+      <a href="https://github.com/nb553/startup" class="text-[var(--teal)] underline">GitHub</a>
     </footer>
   </body>
 </html>

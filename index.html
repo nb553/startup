@@ -3,58 +3,55 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Allergen Audit: Personalized allergen and dietary restriction management for households.">
     <title>Allergen Audit</title>
     <link rel="icon" href="favicon.ico" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="main.css" />
   </head>
-  <body>
-    <header>
-      <h1>Allergen Audit</h1>
+  <body class="min-h-screen flex flex-col">
+    <header class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 p-4 md:px-8 bg-[var(--navy)] border-b-4 border-[var(--teal)]">
+      <h1 class="text-2xl md:text-3xl text-white italic">Allergen Audit</h1>
 
       <nav>
-        <ul>
-          <li><a href="index.html" class="active">Home</a></li>
+        <ul class="flex flex-wrap gap-4 list-none p-0 m-0">
+          <li><a href="index.html" class="current-page">Home</a></li>
           <li><a href="dashboard.html">Dashboard</a></li>
           <li><a href="profile.html">Profile</a></li>
           <li><a href="lookup.html">Lookup</a></li>
-          <li><a href="register.html">Register</a></li>
         </ul>
       </nav>
-
-      <hr />
     </header>
 
-    <main>
-      <h2>Track allergens. Cook safely. Eat anywhere.</h2>
-      <p>
+    <main class="flex-1 max-w-2xl mx-auto w-full p-4 md:p-8 flex flex-col gap-6">
+      <h2 class="text-xl md:text-2xl">Track allergies. Cook safely. Eat anywhere.</h2>
+      <p class="text-base leading-relaxed italic">
         Allergen Audit helps you and your household manage individual allergens
-        and dietary restrictions, flag those needs in recipes, and check
+        and dietary restrictions, flag unsafe ingredients in recipes, and check
         packaged or fast food items on the go.
       </p>
 
       <!-- Authentication placeholder -->
-      <form method="post" action="dashboard.html">
-        <div>
-          <label for="email">Email</label>
+      <form method="post" action="dashboard.html" class="card flex flex-col gap-3 max-w-sm">
+        <div class="flex items-center gap-2">
+          <label for="email" class="w-20">Email</label>
           <span aria-hidden="true">@</span>
-          <input type="email" id="email" name="vEmail" placeholder="your@email.com" required />
+          <input type="email" id="email" name="vEmail" placeholder="your@email.com" class="flex-1 border border-[var(--navy)]/20 rounded px-2 py-1" />
         </div>
-        <div>
-          <label for="password">Password</label>
+        <div class="flex items-center gap-2">
+          <label for="password" class="w-20">Password</label>
           <span aria-hidden="true">🔒</span>
-          <input type="password" id="password" name="vPassword" placeholder="password" required />
+          <input type="password" id="password" name="vPassword" placeholder="password" class="flex-1 border border-[var(--navy)]/20 rounded px-2 py-1" />
         </div>
-        <button type="submit">Login</button>
+        <button type="submit" class="btn-primary self-start">Login</button>
       </form>
- 
-      <p>New here? <a href="register.html">Create an account</a>.</p>
+
+      <p>New here? <a href="register.html" class="btn-secondary">Create an account</a></p>
     </main>
 
-    <footer>
-      <hr />
+    <footer class="p-4 bg-[var(--navy)] border-t-4 border-[var(--teal)] text-center text-white">
       <span>Natasha Burkart</span>
       <br />
-      <a href="https://github.com/nb553/startup">GitHub</a>
+      <a href="https://github.com/nb553/startup" class="text-[var(--teal)] underline">GitHub</a>
     </footer>
   </body>
 </html>

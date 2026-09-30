@@ -1,0 +1,140 @@
+/* Imported fonts (Google Fonts) */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Nunito:ital,wght@0,400;0,600;1,400&display=swap');
+
+/* ---- Palette ---- */
+:root {
+  --navy: #14213d;
+  --teal: #2ec4b6;
+  --cream: #ede6d6;
+  --coral: #ff6b6b;
+  --yellow: #ffe066;
+  --green: #a3d977;
+}
+
+/* ---- Element selectors ---- */
+body {
+  font-family: 'Nunito', sans-serif;
+  background-color: var(--cream);
+  color: var(--navy);
+  margin: 0;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: 'Playfair Display', serif;
+  font-weight: 800;
+  color: var(--navy);
+}
+
+/* ---- Class selectors: functional meaning, not just decoration ---- */
+
+/* Marks an ingredient as unsafe for someone in the household */
+.flagged {
+  color: #a13a3a;
+  font-weight: 700;
+  background-color: rgba(255, 107, 107, 0.18);
+  padding: 0.1em 0.4em;
+  border-radius: 0.3em;
+}
+
+/* Marks a milder caution: intolerance or a needed-but-unmet nutrient threshold */
+.flagged-caution {
+  color: #8a6d00;
+  font-weight: 700;
+  background-color: rgba(255, 224, 102, 0.35);
+  padding: 0.1em 0.4em;
+  border-radius: 0.3em;
+}
+
+/* Marks a suggested safe substitute */
+.substitute {
+  color: #2b7a4b;
+  font-weight: 600;
+}
+
+/* Recipe / result cards */
+.card {
+  background-color: #ffffff;
+  border: 1px solid rgba(20, 33, 61, 0.1);
+  border-radius: 1em;
+  padding: 1.25em;
+  box-shadow: 0 2px 6px rgba(20, 33, 61, 0.08);
+}
+
+/* Pill buttons, styled after the reference design */
+.btn-primary {
+  background-color: var(--coral);
+  color: var(--navy);
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 0.6em 1.5em;
+  border: none;
+  display: inline-block;
+}
+
+.btn-secondary {
+  background-color: var(--yellow);
+  color: var(--navy);
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 0.6em 1.5em;
+  border: none;
+  display: inline-block;
+}
+
+/* ---- ID selector ---- */
+#activity-feed {
+  border-left: 4px solid var(--teal);
+  padding-left: 1em;
+  background-color: rgba(46, 196, 182, 0.1);
+  border-radius: 0.5em;
+}
+
+/* ---- Pseudo selectors ---- */
+nav a {
+  color: var(--cream);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+nav a:hover,
+nav a:focus {
+  color: var(--teal);
+  text-decoration: underline;
+}
+
+nav a.current-page {
+  color: var(--teal);
+  text-decoration: underline;
+}
+
+.btn-primary:hover,
+.btn-secondary:hover {
+  filter: brightness(0.95);
+  cursor: pointer;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 2px;
+}
+
+input:invalid {
+  border-color: var(--coral);
+}
+
+/* Prevent overflow on small screens for wide content */
+table,
+img {
+  max-width: 100%;
+}
+
+table {
+  overflow-x: auto;
+  display: block;
+}
