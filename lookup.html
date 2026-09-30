@@ -13,7 +13,7 @@
     <header class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 p-4 md:px-8 bg-[var(--navy)] border-b-4 border-[var(--teal)]">
       <div>
         <h1 class="text-2xl md:text-3xl text-white italic">Allergen Audit</h1>
-        <p class="text-sm text-white/80">Logged in as <b id="username" class="text-white">Natasha Burkart</b></p>
+        <p class="text-sm text-white/80">Logged in as <b id="username" class="text-white username-display">Natasha Burkart</b></p>
       </div>
       <nav>
         <ul class="flex flex-wrap gap-4 list-none p-0 m-0">
@@ -55,7 +55,8 @@
       <!-- Application data placeholder: search result -->
       <section class="card flex flex-col gap-3">
         <h3 class="font-bold">Result: Taco Bell Crunchy Taco</h3>
-        <table class="w-full border-collapse text-left">
+        <div class="table-wrapper">
+         <table class="w-full border-collapse text-left">
           <caption class="text-left text-sm italic mb-2">Ingredient safety check for Taco Bell Crunchy Taco</caption>
           <thead>
             <tr class="border-b border-[var(--navy)]/20">
@@ -82,6 +83,7 @@
             </tr>
           </tbody>
         </table>
+        </div>
         <p>Not safe for: Mom, Abigail. <span class="substitute">Suggested substitute: no cheese.</span></p>
 
         <div class="mt-2 pt-2 border-t border-[var(--navy)]/10">

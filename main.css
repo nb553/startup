@@ -106,12 +106,11 @@ h4 {
   border-radius: 0.5em;
 }
 
-/* ---- ID selector ---- */
-/* Unique element: username display in header. Kept as ID to satisfy selector variety
-   while keeping reusable component styles as classes above. */
-#username {
+/* Username display - class keeps specificity low and reusable */
+.username-display {
   font-weight: 800;
 }
+
 
 /* ---- Pseudo selectors ---- */
 nav a {
@@ -149,13 +148,17 @@ textarea:focus-visible {
   border-color: var(--coral);
 }
 
-/* Prevent overflow on small screens for wide content */
-table,
+/* Prevent overflow on small screens */
 img {
   max-width: 100%;
 }
 
-table {
+.table-wrapper {
   overflow-x: auto;
-  display: block;
+  max-width: 100%;
+}
+
+table {
+  max-width: 100%;
+  width: 100%;
 }
