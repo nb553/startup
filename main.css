@@ -84,12 +84,33 @@ h4 {
   display: inline-block;
 }
 
-/* ---- ID selector ---- */
-#activity-feed {
+/* Consistent form controls - replaces repetitive Tailwind border/rounded classes */
+.form-input {
+  border: 1px solid rgba(20, 33, 61, 0.2);
+  border-radius: 0.375rem;
+  padding: 0.25rem 0.5rem;
+  background-color: #fff;
+  font: inherit;
+  width: 100%;
+}
+
+.form-input:focus {
+  border-color: var(--teal);
+}
+
+/* Activity feed - changed from #activity-feed ID to class for low specificity and reuse */
+.activity-feed {
   border-left: 4px solid var(--teal);
   padding-left: 1em;
   background-color: rgba(46, 196, 182, 0.1);
   border-radius: 0.5em;
+}
+
+/* ---- ID selector ---- */
+/* Unique element: username display in header. Kept as ID to satisfy selector variety
+   while keeping reusable component styles as classes above. */
+#username {
+  font-weight: 800;
 }
 
 /* ---- Pseudo selectors ---- */
@@ -124,7 +145,7 @@ textarea:focus-visible {
   outline-offset: 2px;
 }
 
-input:invalid {
+.form-input:invalid {
   border-color: var(--coral);
 }
 

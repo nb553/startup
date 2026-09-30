@@ -14,7 +14,7 @@
 
       <nav>
         <ul class="flex flex-wrap gap-4 list-none p-0 m-0">
-          <li><a href="index.html" class="current-page">Home</a></li>
+          <li><a href="index.html" class="current-page" aria-current="page">Home</a></li>
           <li><a href="dashboard.html">Dashboard</a></li>
           <li><a href="profile.html">Profile</a></li>
           <li><a href="lookup.html">Lookup</a></li>
@@ -35,12 +35,12 @@
         <div class="flex items-center gap-2">
           <label for="email" class="w-20">Email</label>
           <span aria-hidden="true">@</span>
-          <input type="email" id="email" name="vEmail" placeholder="your@email.com" class="flex-1 border border-[var(--navy)]/20 rounded px-2 py-1" />
+          <input type="email" id="email" name="vEmail" placeholder="your@email.com" class="form-input flex-1" />
         </div>
         <div class="flex items-center gap-2">
           <label for="password" class="w-20">Password</label>
           <span aria-hidden="true">🔒</span>
-          <input type="password" id="password" name="vPassword" placeholder="password" class="flex-1 border border-[var(--navy)]/20 rounded px-2 py-1" />
+          <input type="password" id="password" name="vPassword" placeholder="password" class="form-input flex-1" />
         </div>
         <button type="submit" class="btn-primary self-start">Login</button>
       </form>

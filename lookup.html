@@ -20,7 +20,7 @@
           <li><a href="index.html">Home</a></li>
           <li><a href="dashboard.html">Dashboard</a></li>
           <li><a href="profile.html">Profile</a></li>
-          <li><a href="lookup.html" class="current-page">Lookup</a></li>
+          <li><a href="lookup.html" class="current-page" aria-current="page">Lookup</a></li>
         </ul>
       </nav>
     </header>
@@ -35,7 +35,7 @@
           <h3 class="font-bold">Search by name</h3>
           <form class="flex flex-col gap-2">
             <label for="food-search">Food or restaurant item</label>
-            <input type="search" id="food-search" name="foodSearch" placeholder="e.g. Taco Bell Crunchy Taco" class="border border-[var(--navy)]/20 rounded px-2 py-1" />
+            <input type="search" id="food-search" name="foodSearch" placeholder="e.g. Taco Bell Crunchy Taco" class="form-input" />
             <button type="submit" class="btn-primary self-start">Search</button>
           </form>
         </section>
@@ -45,7 +45,7 @@
           <h3 class="font-bold">Scan a label</h3>
           <form class="flex flex-col gap-2">
             <label for="label-photo">Take or upload a photo of the packaging</label>
-            <input type="file" id="label-photo" name="labelPhoto" accept="image/*" capture="environment" aria-describedby="label-photo-help" class="border border-[var(--navy)]/20 rounded px-2 py-1" />
+            <input type="file" id="label-photo" name="labelPhoto" accept="image/*" capture="environment" aria-describedby="label-photo-help" class="form-input" />
             <p id="label-photo-help" class="text-sm italic">For best results, use a clear, well-lit photo of the full ingredients label.</p>
             <button type="submit" class="btn-secondary self-start">Scan</button>
           </form>
@@ -91,6 +91,8 @@
             <li>Calories: <span class="flagged-caution">170</span> &mdash; 6% of Abby Wischmeier's ~2,800 kcal/day goal</li>
           </ul>
         </div>
+      </section>
+    </main>
 
     <footer class="p-4 bg-[var(--navy)] border-t-4 border-[var(--teal)] text-center text-white">
       <span>Natasha Burkart</span>
