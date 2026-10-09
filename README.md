@@ -123,10 +123,10 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 
 For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
 
-- [ ] I completed the prerequisites for this deliverable (Simon deployed, GitHub link, Git commits)
-- [ ] **Bundled using Vite** - I did not complete this part of the deliverable.
-- [ ] **Components** - I did not complete this part of the deliverable.
-- [ ] **Router** - I did not complete this part of the deliverable.
+- [X] I completed the prerequisites for this deliverable (Simon deployed, GitHub link, Git commits)
+- [X] **Bundled using Vite** - Installed Vite as a dev dependency and configured package.json with dev/build/preview scripts; ran the app locally with npm run dev and hot reloading.
+- [X] **Components** - Converted all 5 HTML pages (Login, Dashboard, Lookup, Profile, Register) into React function components in src/ folders, changing class to className and for to htmlFor; shared styles moved to src/app.css.
+- [X] **Router** - Created a React Router with BrowserRouter, Routes, and NavLink that maps /, /dashboard, /profile, /lookup, and /register to their components without full page reloads, plus a NotFound route for unknown paths.
 
 ## 🚀 React part 2: Reactivity deliverable
 
