@@ -24,4 +24,4 @@ Built out the core pages for Allergen Audit: `index.html` (login/landing), `dash
 
 ## React
 
-Interesting things I have learned about React
+React turns multi-page HTML into a single-page app: one index.html loads everything through index.jsx into a root div. Pages become function components in src/ folders that return JSX — I had to change class to className and for to htmlFor. React Router (BrowserRouter, Routes, Route, NavLink) swaps components without page reloads; to="dashboard" replaces href="dashboard.html". Vite bundles it with npm run dev for hot reloading. I learned to debug by checking the DOM in Inspect when elements render but aren't visible, which caught a Bootstrap class conflict hiding my nav links.
