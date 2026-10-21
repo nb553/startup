@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './app.css';
 import { BrowserRouter, NavLink, Route, Routes } from 'react-router-dom';
@@ -9,11 +9,37 @@ import { Profile } from './profile/profile';
 import { Register } from './register/register';
 
 export default function App() {
+  // Initialize from localStorage so a page refresh keeps the user "logged in"
+  const [userName, setUserName] = useState(() => localStorage.getItem('userName') || '');
+
+  // Mocked auth persistence: real login/session handling comes in a later deliverable
+  useEffect(() => {
+    if (userName) {
+      localStorage.setItem('userName', userName);
+    }
+  }, [userName]);
+
+  function logout() {
+    localStorage.removeItem('userName');
+    localStorage.removeItem('userEmail');
+    setUserName('');
+  }
+
   return (
     <BrowserRouter>
       <div className="body">
         <header className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 p-4 md:px-8 bg-[var(--navy)] border-b-4 border-[var(--teal)]">
-          <h1 className="text-2xl md:text-3xl text-white italic">Allergen Audit</h1>
+          <div>
+            <h1 className="text-2xl md:text-3xl text-white italic">Allergen Audit</h1>
+            {userName && (
+              <p className="text-sm text-white/80">
+                Logged in as <b>{userName}</b>{' '}
+                <button onClick={logout} className="underline text-white/80 ml-2 bg-transparent border-0 p-0 cursor-pointer">
+                  (log out)
+                </button>
+              </p>
+            )}
+          </div>
           <nav>
             <ul className="flex flex-wrap gap-4 list-none p-0 m-0">
               <li><NavLink to="">Home</NavLink></li>
@@ -25,11 +51,11 @@ export default function App() {
         </header>
 
         <Routes>
-          <Route path='/' element={<Login />} exact />
-          <Route path='/dashboard' element={<Dashboard />} />
-          <Route path='/profile' element={<Profile />} />
+          <Route path='/' element={<Login setUserName={setUserName} />} exact />
+          <Route path='/dashboard' element={<Dashboard userName={userName} />} />
+          <Route path='/profile' element={<Profile userName={userName} />} />
           <Route path='/lookup' element={<Lookup />} />
-          <Route path='/register' element={<Register />} />
+          <Route path='/register' element={<Register setUserName={setUserName} />} />
           <Route path='*' element={<NotFound />} />
         </Routes>
 
