@@ -1,3 +1,5 @@
+@import 'tailwindcss';
+
 /* Imported fonts (Google Fonts) */
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Nunito:ital,wght@0,400;0,600;1,400&display=swap');
 
@@ -11,7 +13,6 @@
   --green: #a3d977;
 }
 
-/* ---- Element selectors ---- */
 .body {
   font-family: 'Nunito', sans-serif;
   background-color: var(--cream);
@@ -31,9 +32,8 @@ h4 {
   color: var(--navy);
 }
 
-/* ---- Class selectors: functional meaning, not just decoration ---- */
+/* ---- Class selectors ---- */
 
-/* Marks an ingredient as unsafe for someone in the household */
 .flagged {
   color: #a13a3a;
   font-weight: 700;
@@ -42,7 +42,6 @@ h4 {
   border-radius: 0.3em;
 }
 
-/* Marks a milder caution: intolerance or a needed-but-unmet nutrient threshold */
 .flagged-caution {
   color: #8a6d00;
   font-weight: 700;
@@ -51,13 +50,11 @@ h4 {
   border-radius: 0.3em;
 }
 
-/* Marks a suggested safe substitute */
 .substitute {
   color: #2b7a4b;
   font-weight: 600;
 }
 
-/* Recipe / result cards */
 .card {
   background-color: #ffffff;
   border: 1px solid rgba(20, 33, 61, 0.1);
@@ -66,7 +63,6 @@ h4 {
   box-shadow: 0 2px 6px rgba(20, 33, 61, 0.08);
 }
 
-/* Pill buttons, styled after the reference design */
 .btn-primary,
 .btn-secondary {
   font-weight: 700;
@@ -99,7 +95,6 @@ h4 {
   border-color: var(--teal);
 }
 
-/* Activity feed - changed from #activity-feed ID to class for low specificity and reuse */
 .activity-feed {
   border-left: 4px solid var(--teal);
   padding-left: 1em;
@@ -107,19 +102,14 @@ h4 {
   border-radius: 0.5em;
 }
 
-/* ID selector for rubric - non-visual to avoid specificity issues */
 #activity-feed {
   scroll-margin-top: 1rem;
 }
 
-
-/* Username display - class keeps specificity low and reusable */
 .username-display {
   font-weight: 800;
 }
 
-
-/* ---- Pseudo selectors ---- */
 nav a {
   color: var(--cream);
   text-decoration: none;
@@ -160,7 +150,6 @@ textarea:focus-visible {
   border-color: var(--coral);
 }
 
-/* Prevent overflow on small screens */
 img {
   max-width: 100%;
 }

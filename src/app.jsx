@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import './app.css';
 import { BrowserRouter, Navigate, NavLink, Route, Routes, useNavigate } from 'react-router-dom';
 import { Login } from './login/login';
@@ -17,11 +16,9 @@ export default function App() {
 }
 
 function AppContent() {
-  // Initialize from localStorage so a page refresh keeps the user "logged in"
   const [userName, setUserName] = useState(() => localStorage.getItem('userName') || '');
   const navigate = useNavigate();
 
-  // Mocked auth persistence: real login/session handling comes in a later deliverable
   useEffect(() => {
     if (userName) {
       localStorage.setItem('userName', userName);
@@ -51,10 +48,10 @@ function AppContent() {
           </div>
           <nav>
             <ul className="flex flex-wrap gap-4 list-none p-0 m-0">
-              <li><NavLink to="">Home</NavLink></li>
-              <li><NavLink to="dashboard">Dashboard</NavLink></li>
-              <li><NavLink to="profile">Profile</NavLink></li>
-              <li><NavLink to="lookup">Lookup</NavLink></li>
+              <li><NavLink to="/" end className={({ isActive }) => (isActive ? 'current-page' : '')}>Home</NavLink></li>
+              <li><NavLink to="/dashboard" className={({ isActive }) => (isActive ? 'current-page' : '')}>Dashboard</NavLink></li>
+              <li><NavLink to="/profile" className={({ isActive }) => (isActive ? 'current-page' : '')}>Profile</NavLink></li>
+              <li><NavLink to="/lookup" className={({ isActive }) => (isActive ? 'current-page' : '')}>Lookup</NavLink></li>
             </ul>
           </nav>
         </header>
@@ -102,9 +99,6 @@ function NotFound() {
   return <main>404: Return to sender. Address unknown.</main>;
 }
 
-// Mocked route guard: real session/token validation comes in a later
-// deliverable once there's a backend. For now, controls what gets
-// rendered based on whether a name is currently stored for this browser.
 function RequireAuth({ userName, children }) {
   if (!userName) {
     return <Navigate to='/' replace />;
