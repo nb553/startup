@@ -82,7 +82,7 @@ function RecipeCard({ recipe }) {
         <p className="font-bold text-sm">Nutrition (per serving)</p>
         <ul className="text-sm list-disc list-inside">
           <li>
-            Sodium: <span className="flagged-caution">{recipe.sodium}mg</span> &mdash; contributes toward Lucy Breen's
+            Sodium: <span className="flagged-caution">{recipe.sodium}mg</span> &mdash; contributes toward Lucy's
             2,400mg/day sodium need
           </li>
           <li>Calories: {recipe.calories}</li>
@@ -216,7 +216,7 @@ export function Dashboard({ userName }) {
       </section>
 
       <section className="card flex flex-col gap-2">
-        <h3 className="text-lg font-bold">Today's Sodium Total &mdash; Lucy Breen (Peaks Ice Arena)</h3>
+        <h3 className="text-lg font-bold">Today's Sodium Total &mdash; Lucy (Peaks Ice Arena)</h3>
         <p>
           {recipes.map((r) => `${r.name} (${r.sodium}mg)`).join(' + ')} ={' '}
           <span className="flagged-caution">{totalSodium}mg</span> toward her {sodiumGoal.toLocaleString()}mg/day need

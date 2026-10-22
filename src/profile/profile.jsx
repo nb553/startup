@@ -36,10 +36,10 @@ const initialHouseholds = [
     name: 'Peaks Ice Arena',
     members: [
       'Natasha (me) — allergic to peanuts, treenuts, legumes, chocolate, carrots, chicken',
-      'Mira Jensen — vegan (dietary preference)',
-      'Lucy Breen — needs at least 2,400mg sodium/day (6g salt)',
-      'Brenda Juarez — no restrictions',
-      'Abby Wischmeier — calorie goal ~2,800 kcal/day',
+      'Mira — vegan (dietary preference)',
+      'Lucy — needs at least 2,400mg sodium/day (6g salt)',
+      'Brenda — no restrictions',
+      'Abby — calorie goal ~2,800 kcal/day',
     ],
   },
 ];
