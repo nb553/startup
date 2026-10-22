@@ -6,6 +6,7 @@ export function Lookup() {
   const [result, setResult] = useState(null);
   const [message, setMessage] = useState('');
   const [photoName, setPhotoName] = useState('');
+  const [isScanning, setIsScanning] = useState(false);
 
   function findFood(text) {
     const key = text.trim().toLowerCase();
@@ -41,10 +42,19 @@ export function Lookup() {
       setMessage('Choose a photo of the label first.');
       return;
     }
-    // Mocked label scan: there is no real image reading yet, so the scan
-    // returns our sample food so the result display can be tested.
-    setResult(brandedFoods['taco bell crunchy taco']);
-    setMessage(`Mock scan of ${photoName}: label read as Taco Bell Crunchy Taco.`);
+
+    // Mocked label scan: there is no real image reading yet. A short
+    // artificial delay stands in for the real network/processing time a
+    // future image-recognition API call will actually take.
+    setIsScanning(true);
+    setResult(null);
+    setMessage('');
+
+    setTimeout(() => {
+      setResult(brandedFoods['taco bell crunchy taco']);
+      setMessage(`Mock scan of ${photoName}: label read as Taco Bell Crunchy Taco.`);
+      setIsScanning(false);
+    }, 1200);
   }
 
   const allFlags = result
@@ -94,7 +104,9 @@ export function Lookup() {
               onChange={(e) => setPhotoName(e.target.files[0] ? e.target.files[0].name : '')}
             />
             <p id="label-photo-help" className="text-sm italic">For best results, use a clear, well-lit photo of the full ingredients label.</p>
-            <button type="submit" className="btn-secondary self-start">Scan</button>
+            <button type="submit" className="btn-secondary self-start" disabled={isScanning}>
+              {isScanning ? 'Scanning…' : 'Scan'}
+            </button>
           </form>
         </section>
       </div>

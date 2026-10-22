@@ -22,6 +22,8 @@ function AppContent() {
   useEffect(() => {
     if (userName) {
       localStorage.setItem('userName', userName);
+    } else {
+      localStorage.removeItem('userName');
     }
   }, [userName]);
 

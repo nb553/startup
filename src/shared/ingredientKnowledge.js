@@ -104,6 +104,27 @@ export const brandedFoods = {
   },
 };
 
+// Calculates combined nutrition totals for a list of ingredient line
+// strings, and counts how many weren't found in ingredientKnowledge.
+// Pulled out of the Dashboard component so it stays focused on UI.
+export function calculateNutritionTotals(lines) {
+  const totals = { calories: 0, sodiumMg: 0, sugarG: 0, fiberG: 0, proteinG: 0, fatG: 0 };
+  let unknownCount = 0;
+
+  for (const line of lines) {
+    const entry = ingredientKnowledge[line.trim().toLowerCase()];
+    if (entry && entry.nutritionPerServing) {
+      for (const key of Object.keys(totals)) {
+        totals[key] += entry.nutritionPerServing[key] || 0;
+      }
+    } else {
+      unknownCount += 1;
+    }
+  }
+
+  return { totals, unknownCount };
+}
+
 // Looks up one ingredient name (any capitalization) and works out who
 // in the household it flags. A name matches a member's lists if the
 // name itself, anything in partOf, or anything in contains is on the

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ingredientKnowledge, getIngredientFlags } from '../shared/ingredientKnowledge';
+import { getIngredientFlags, calculateNutritionTotals } from '../shared/ingredientKnowledge';
 
 // Seed recipes. Ingredients are just names — who they flag is worked
 // out from the shared ingredient knowledge when the card renders, so
@@ -138,19 +138,7 @@ export function Dashboard({ userName }) {
       .map((line) => line.trim())
       .filter(Boolean);
 
-    const totals = { calories: 0, sodiumMg: 0, sugarG: 0, fiberG: 0, proteinG: 0, fatG: 0 };
-    let unknownCount = 0;
-
-    for (const line of lines) {
-      const entry = ingredientKnowledge[line.toLowerCase()];
-      if (entry && entry.nutritionPerServing) {
-        for (const key of Object.keys(totals)) {
-          totals[key] += entry.nutritionPerServing[key] || 0;
-        }
-      } else {
-        unknownCount += 1;
-      }
-    }
+    const { totals, unknownCount } = calculateNutritionTotals(lines);
 
     const newRecipe = {
       id: Date.now(),

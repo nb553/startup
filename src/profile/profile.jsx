@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from 'react';
 
 const initialAllergens = [
-  { name: 'Peanuts', level: 'Severe allergy' },
-  { name: 'Treenuts', level: 'Severe allergy' },
-  { name: 'Legumes', level: 'Severe allergy' },
-  { name: 'Chocolate', level: 'Severe allergy' },
-  { name: 'Carrots', level: 'Severe allergy' },
-  { name: 'Chicken', level: 'Severe allergy' },
+  { id: 'a1', name: 'Peanuts', level: 'Severe allergy' },
+  { id: 'a2', name: 'Treenuts', level: 'Severe allergy' },
+  { id: 'a3', name: 'Legumes', level: 'Severe allergy' },
+  { id: 'a4', name: 'Chocolate', level: 'Severe allergy' },
+  { id: 'a5', name: 'Carrots', level: 'Severe allergy' },
+  { id: 'a6', name: 'Chicken', level: 'Severe allergy' },
 ];
 
 const initialHouseholds = [
   {
+    id: 'h1',
     name: 'Burkart Family',
     members: [
       'Mom — lactose intolerant',
@@ -22,6 +23,7 @@ const initialHouseholds = [
     ],
   },
   {
+    id: 'h2',
     name: 'Provo Apt',
     members: [
       'Grace — celiac',
@@ -30,6 +32,7 @@ const initialHouseholds = [
     ],
   },
   {
+    id: 'h3',
     name: 'Peaks Ice Arena',
     members: [
       'Natasha (me) — allergic to peanuts, treenuts, legumes, chocolate, carrots, chicken',
@@ -60,7 +63,10 @@ export function Profile({ userName }) {
   const [goalType, setGoalType] = useState('Maximum limit per day');
   const [goalAmount, setGoalAmount] = useState('');
 
-  const [households, setHouseholds] = useState(initialHouseholds);
+  const [households, setHouseholds] = useState(() => {
+    const saved = localStorage.getItem('households');
+    return saved ? JSON.parse(saved) : initialHouseholds;
+  });
   const [newHouseholdName, setNewHouseholdName] = useState('');
   const [joinCode, setJoinCode] = useState('');
   const [joinMessage, setJoinMessage] = useState('');
@@ -73,16 +79,20 @@ export function Profile({ userName }) {
     localStorage.setItem('nutritionGoals', JSON.stringify(goals));
   }, [goals]);
 
+  useEffect(() => {
+    localStorage.setItem('households', JSON.stringify(households));
+  }, [households]);
+
   function handleAddAllergen(e) {
     e.preventDefault();
     if (!newAllergen.trim()) return;
-    setAllergens((prev) => [...prev, { name: newAllergen.trim(), level: newLevel }]);
+    setAllergens((prev) => [...prev, { id: Date.now(), name: newAllergen.trim(), level: newLevel }]);
     setNewAllergen('');
     setNewLevel('Severe allergy');
   }
 
-  function handleRemoveAllergen(name) {
-    setAllergens((prev) => prev.filter((a) => a.name !== name));
+  function handleRemoveAllergen(id) {
+    setAllergens((prev) => prev.filter((a) => a.id !== id));
   }
 
   function handleAddGoal(e) {
@@ -95,7 +105,7 @@ export function Profile({ userName }) {
   function handleCreateHousehold(e) {
     e.preventDefault();
     if (!newHouseholdName.trim()) return;
-    setHouseholds((prev) => [...prev, { name: newHouseholdName.trim(), members: [`${displayName} (me)`] }]);
+    setHouseholds((prev) => [...prev, { id: Date.now(), name: newHouseholdName.trim(), members: [`${displayName} (me)`] }]);
     setNewHouseholdName('');
   }
 
@@ -104,7 +114,7 @@ export function Profile({ userName }) {
     if (!joinCode.trim()) return;
     // Mocked join: there is no real household service yet, so any code
     // "joins" a household named by the code in this browser only.
-    setHouseholds((prev) => [...prev, { name: `Household ${joinCode.trim()}`, members: [`${displayName} (me)`] }]);
+    setHouseholds((prev) => [...prev, { id: Date.now(), name: `Household ${joinCode.trim()}`, members: [`${displayName} (me)`] }]);
     setJoinMessage(`Joined with code ${joinCode.trim()} (mock — no server yet).`);
     setJoinCode('');
   }
@@ -122,7 +132,7 @@ export function Profile({ userName }) {
           <h4 className="font-bold">Allergens &amp; Restrictions</h4>
           <ul className="list-disc list-inside">
             {allergens.map((a) => (
-              <li key={a.name}>
+              <li key={a.id}>
                 {a.level === 'Severe allergy' ? (
                   <span className="flagged">{a.name}</span>
                 ) : a.level === 'Intolerance' ? (
@@ -133,7 +143,7 @@ export function Profile({ userName }) {
                 &mdash; {a.level.toLowerCase()}{' '}
                 <button
                   type="button"
-                  onClick={() => handleRemoveAllergen(a.name)}
+                  onClick={() => handleRemoveAllergen(a.id)}
                   className="underline bg-transparent border-0 p-0 cursor-pointer text-sm"
                 >
                   (remove)
@@ -242,7 +252,7 @@ export function Profile({ userName }) {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {households.map((household) => (
-            <article key={household.name} className="card">
+            <article key={household.id} className="card">
               <h4 className="font-bold mb-2">{household.name}</h4>
               <ul className="list-disc list-inside">
                 {household.members.map((member, i) => (
