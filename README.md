@@ -86,8 +86,8 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 
 For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
 
-- [X] **Rented EC2 server** - I did not complete this part of the deliverable.
-- [X] **Leased domain name** - I did not complete this part of the deliverable.
+- [X] **Rented EC2 server** - Set up an EC2 instance in AWS to host my production environment.
+- [X] **Leased domain name** - Registered burkart260webprogramming.click and pointed it at my EC2 instance via Route 53.
 - [X] **Server accessible** from my domain: [https://burkart260webprogramming.click](https://burkart260webprogramming.click) - **Very original name lol**.
 
 _Finally got my domain and IP working after some time. I didn't realize how extensive it is to actually create a domain and all the components that go into it. But rn it works. If I do come across an issue I will reach out again_
@@ -113,7 +113,7 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 
 - [X] I completed the prerequisites for this deliverable (Simon deployed, GitHub link, Git commits)
 - [X] **Visually appealing colors and layout. No overflowing elements.** - Used a custom navy/teal/cream/coral/yellow palette across the whole app; images and tables are capped with max-width and tables scroll horizontally instead of overflowing on small screens.
-- [X] **Use of a CSS framework** - Used Tailwind CSS via the CDN script for layout, spacing, and responsive utility classes on every page.
+- [X] **Use of a CSS framework** - Used Tailwind CSS, installed via npm and configured as a Vite plugin, for layout, spacing, and responsive utility classes on every page.
 - [X] **All visual elements styled using CSS** - Every page shares a consistent look through main.css and Tailwind classes: cards, buttons, nav, forms, and tables all styled, not left as raw browser defaults.
 - [X] **Responsive to window resizing using flexbox and/or grid display** - Header/footer use flex to stack on narrow screens and go horizontal on wider ones; recipe cards, household cards, and lookup results use CSS grid that reflows from 1 to 3 columns depending on screen width.
 - [X] **Use of a imported font** - Imported Playfair Display (headings) and Nunito (body text) from Google Fonts via @import in main.css.
@@ -132,9 +132,9 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 
 For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
 
-- [ ] I completed the prerequisites for this deliverable (Simon deployed, GitHub link, Git commits)
-- [ ] **All functionality implemented or mocked out** - I did not complete this part of the deliverable.
-- [ ] **Hooks** - I did not complete this part of the deliverable.
+- [X] I completed the prerequisites for this deliverable (Simon deployed, GitHub link, Git commits)
+- [X] **All functionality implemented or mocked out** - Login/Register write a mocked user session to localStorage and redirect to the dashboard; a RequireAuth wrapper protects the dashboard, profile, and lookup routes and redirects back to login if no session exists. The dashboard's "Add a new recipe" form checks each typed ingredient against a shared ingredient/allergen knowledge base, flags anything unsafe for a household member, and calculates real nutrition totals from scratch instead of hardcoded numbers; those totals update live as recipes are added. A mocked household activity feed uses setInterval to simulate messages that would arrive over a real WebSocket later. The profile page's allergen list, nutrition goals, and household list are all fully editable (add/remove), and persist across reloads via localStorage. The lookup page supports a mocked food search and a mocked label-scan flow (with a simulated loading delay) backed by the same shared ingredient data as the dashboard.
+- [X] **Hooks** - useState manages all of the above (recipes, activity feed, allergens, goals, households, form inputs, auth session). useEffect handles the mocked WebSocket interval (with proper cleanup via clearInterval), and persists recipes/allergens/goals/households/auth state to localStorage whenever they change.
 
 ## 🚀 Service deliverable
 
