@@ -103,9 +103,13 @@ function RecipeCard({ recipe }) {
 
 export function Dashboard({ userName }) {
   const [recipes, setRecipes] = useState(() => {
+  try {
     const saved = localStorage.getItem('recipes');
     return saved ? JSON.parse(saved) : initialRecipes;
-  });
+  } catch {
+    return initialRecipes;
+  }
+});
   const [recipeName, setRecipeName] = useState('');
   const [recipeIngredients, setRecipeIngredients] = useState('');
   const [activity, setActivity] = useState([

@@ -46,8 +46,11 @@ const initialHouseholds = [
 
 export function Profile({ userName }) {
   const displayName = userName || 'Natasha Burkart';
-  const [email] = useState(() => localStorage.getItem('userEmail') || 'tay2burkart728@gmail.com');
+  const [email, setEmail] = useState(() => localStorage.getItem('userEmail') || '');
 
+  useEffect(() => {
+    setEmail(localStorage.getItem('userEmail') || '');
+  }, []);
   const [allergens, setAllergens] = useState(() => {
     const saved = localStorage.getItem('myAllergens');
     return saved ? JSON.parse(saved) : initialAllergens;
@@ -127,7 +130,8 @@ export function Profile({ userName }) {
         <img src="/profile.png" alt="Natasha Burkart's profile picture" className="rounded-full w-28 h-28 object-cover" />
         <div className="flex-1 flex flex-col gap-2">
           <h3 className="text-lg font-bold">{displayName}</h3>
-          <p>{email}</p>
+          {email && <p>{email}</p>}
+
 
           <h4 className="font-bold">Allergens &amp; Restrictions</h4>
           <ul className="list-disc list-inside">
