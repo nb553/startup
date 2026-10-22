@@ -50,6 +50,14 @@ h4 {
   border-radius: 0.3em;
 }
 
+.check-source {
+  color: #14507a;
+  font-weight: 700;
+  background-color: rgba(94, 178, 228, 0.25);
+  padding: 0.1em 0.4em;
+  border-radius: 0.3em;
+}
+
 .substitute {
   color: #2b7a4b;
   font-weight: 600;
