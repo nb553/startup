@@ -102,14 +102,45 @@ function RecipeCard({ recipe }) {
 }
 
 export function Dashboard({ userName }) {
-  const [recipes, setRecipes] = useState(() => {
-  try {
-    const saved = localStorage.getItem('recipes');
-    return saved ? JSON.parse(saved) : initialRecipes;
-  } catch {
-    return initialRecipes;
-  }
-});
+  const [recipes, setRecipes] = useState([]);
+  const [household, setHousehold] = useState(null);
+
+  // Recipes live on the service now: load my households and use the
+  // first one's recipes. A first visit creates the household and
+  // seeds it with the demo recipes so the board isn't empty.
+  useEffect(() => {
+    async function load() {
+      try {
+        const res = await fetch('/api/households');
+        if (!res.ok) return;
+        let mine = await res.json();
+        if (mine.length === 0) {
+          const createRes = await fetch('/api/households', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: 'Burkart Family' }),
+          });
+          if (!createRes.ok) return;
+          const created = await createRes.json();
+          for (const seed of initialRecipes) {
+            await fetch(`/api/households/${created.id}/recipes`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(seed),
+            });
+          }
+          mine = [created];
+        }
+        setHousehold(mine[0]);
+        const recipesRes = await fetch(`/api/households/${mine[0].id}/recipes`);
+        if (recipesRes.ok) setRecipes(await recipesRes.json());
+      } catch {
+        // Service unreachable — the board stays empty rather than crashing.
+      }
+    }
+    load();
+  }, []);
+
   const [recipeName, setRecipeName] = useState('');
   const [recipeIngredients, setRecipeIngredients] = useState('');
   const [activity, setActivity] = useState([
@@ -129,11 +160,8 @@ export function Dashboard({ userName }) {
     return () => clearInterval(interval);
   }, []);
 
-  useEffect(() => {
-    localStorage.setItem('recipes', JSON.stringify(recipes));
-  }, [recipes]);
-
-  function handleAddRecipe(e) {
+  async function handleAddRecipe(e) {
+    if (!recipeName.trim() || !recipeIngredients.trim() || !household) return;
     e.preventDefault();
     if (!recipeName.trim() || !recipeIngredients.trim()) return;
 
@@ -144,8 +172,7 @@ export function Dashboard({ userName }) {
 
     const { totals, unknownCount } = calculateNutritionTotals(lines);
 
-    const newRecipe = {
-      id: Date.now(),
+    const draft = {
       name: recipeName,
       image: null,
       sodium: totals.sodiumMg,
@@ -157,7 +184,19 @@ export function Dashboard({ userName }) {
       ingredients: lines,
     };
 
-    setRecipes((prev) => [...prev, newRecipe]);
+      try {
+        const res = await fetch(`/api/households/${household.id}/recipes`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(draft),
+        });
+        if (res.ok) {
+          const saved = await res.json();
+          setRecipes((prev) => [...prev, saved]);
+        }
+      } catch {
+        // Service unreachable — the recipe isn't added.
+      }
     setActivity((prev) => [{ who: userName || 'You', text: `added a new recipe: ${recipeName}.` }, ...prev].slice(0, 6));
     setRecipeName('');
     setRecipeIngredients('');
@@ -171,7 +210,7 @@ export function Dashboard({ userName }) {
     <main className="flex-1 max-w-5xl mx-auto w-full p-4 md:p-8 flex flex-col gap-8">
       <div>
         <h2 className="text-xl md:text-2xl">Household Dashboard</h2>
-        <p className="italic">Household: <span id="household-name">Burkart Family</span></p>
+        <p className="italic">Household: <span id="household-name">{household ? household.name : 'Loading…'}</span></p>
       </div>
 
       <section className="flex flex-col gap-4">

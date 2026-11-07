@@ -1,40 +1,5 @@
 import React, { useState, useEffect } from 'react';
 
-const initialHouseholds = [
-  {
-    id: 'h1',
-    name: 'Burkart Family',
-    members: [
-      'Mom — lactose intolerant',
-      'Dad — allergic to paprika, bell peppers',
-      'Joe Jr — allergic to carrots, lactose intolerant',
-      'Abigail — no restrictions',
-      'Toby — allergic to cherries',
-      'Natasha (me) — allergic to peanuts, treenuts, legumes, chocolate, carrots, chicken',
-    ],
-  },
-  {
-    id: 'h2',
-    name: 'Provo Apt',
-    members: [
-      'Grace — celiac',
-      'Elyse — celiac',
-      'Natasha (me) — allergic to peanuts, treenuts, legumes, chocolate, carrots, chicken',
-    ],
-  },
-  {
-    id: 'h3',
-    name: 'Peaks Ice Arena',
-    members: [
-      'Natasha (me) — allergic to peanuts, treenuts, legumes, chocolate, carrots, chicken',
-      'Mira — vegan (dietary preference)',
-      'Lucy — needs at least 2,400mg sodium/day (6g salt)',
-      'Brenda — no restrictions',
-      'Abby — calorie goal ~2,800 kcal/day',
-    ],
-  },
-];
-
 export function Profile({ userName }) {
   const displayName = userName || 'Natasha Burkart';
   const [email, setEmail] = useState(() => localStorage.getItem('userEmail') || '');
@@ -76,10 +41,15 @@ export function Profile({ userName }) {
   const [goalType, setGoalType] = useState('Maximum limit per day');
   const [goalAmount, setGoalAmount] = useState('');
 
-  const [households, setHouseholds] = useState(() => {
-    const saved = localStorage.getItem('households');
-    return saved ? JSON.parse(saved) : initialHouseholds;
-  });
+  const [households, setHouseholds] = useState([]);
+
+  useEffect(() => {
+    fetch('/api/households')
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data) => setHouseholds(data))
+      .catch(() => {});
+  }, []);
+
   const [newHouseholdName, setNewHouseholdName] = useState('');
   const [joinCode, setJoinCode] = useState('');
   const [joinMessage, setJoinMessage] = useState('');
@@ -111,7 +81,7 @@ export function Profile({ userName }) {
   function handleAddAllergen(e) {
     e.preventDefault();
     if (!newAllergen.trim()) return;
-    setAllergens((prev) => [...prev, { id: crypto.radomUUID(), name: newAllergen.trim(), level: newLevel }]);
+    setAllergens((prev) => [...prev, { id: crypto.randomUUID(), name: newAllergen.trim(), level: newLevel }]);
     setNewAllergen('');
     setNewLevel('Severe allergy');
   }
@@ -127,22 +97,39 @@ export function Profile({ userName }) {
     setGoalAmount('');
   }
 
-  function handleCreateHousehold(e) {
+  async function handleCreateHousehold(e) {
     e.preventDefault();
     if (!newHouseholdName.trim()) return;
-    setHouseholds((prev) => [...prev, { id: Date.now(), name: newHouseholdName.trim(), members: [`${displayName} (me)`] }]);
+    const res = await fetch('/api/households', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: newHouseholdName.trim() }),
+    });
+    if (res.ok) {
+      const created = await res.json();
+      setHouseholds((prev) => [...prev, created]);
+    }
     setNewHouseholdName('');
   }
 
-  function handleJoinHousehold(e) {
+  async function handleJoinHousehold(e) {
     e.preventDefault();
     if (!joinCode.trim()) return;
-    // Mocked join: there is no real household service yet, so any code
-    // "joins" a household named by the code in this browser only.
-    setHouseholds((prev) => [...prev, { id: Date.now(), name: `Household ${joinCode.trim()}`, members: [`${displayName} (me)`] }]);
-    setJoinMessage(`Joined with code ${joinCode.trim()} (mock — no server yet).`);
+    const res = await fetch('/api/households/join', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code: joinCode.trim() }),
+    });
+    if (res.ok) {
+      const joined = await res.json();
+      setHouseholds((prev) => [...prev, joined]);
+      setJoinMessage(`Joined ${joined.name}.`);
+    } else {
+      setJoinMessage('No household found for that code.');
+    }
     setJoinCode('');
   }
+
 
   return (
     <main className="flex-1 max-w-4xl mx-auto w-full p-4 md:p-8 flex flex-col gap-8">
@@ -280,6 +267,7 @@ export function Profile({ userName }) {
           {households.map((household) => (
             <article key={household.id} className="card">
               <h4 className="font-bold mb-2">{household.name}</h4>
+              <p className="text-sm italic mb-2">Invite code: {household.code}</p>
               <ul className="list-disc list-inside">
                 {household.members.map((member, i) => (
                   <li key={i}>{member}</li>
@@ -318,7 +306,7 @@ export function Profile({ userName }) {
               onChange={(e) => setJoinCode(e.target.value)}
             />
             <button type="submit" className="btn-secondary self-start">Join</button>
-            {joinMessage && <p className="text-sm italic">{joinMessage}</p>}
+            {joinMessage && <p className="text-sm italic mb-2">Invite code: {household.code}</p>}
           </form>
         </div>
       </section>

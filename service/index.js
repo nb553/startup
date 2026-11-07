@@ -165,8 +165,15 @@ apiRouter.post('/households/:id/recipes', verifyAuth, (req, res) => {
   const recipe = {
     id: uuid.v4(),
     name: req.body.name,
+    image: req.body.image || null,
+    sodium: req.body.sodium || 0,
+    calories: req.body.calories || 0,
+    extraNutrition: req.body.extraNutrition || '',
+    nutritionDetails: req.body.nutritionDetails || null,
+    substitutes: Array.isArray(req.body.substitutes) ? req.body.substitutes : [],
     ingredients: req.body.ingredients,
   };
+
   household.recipes.push(recipe);
   res.status(201).send(recipe);
 });
@@ -200,6 +207,7 @@ fetch('https://static.openfoodfacts.org/data/taxonomies/ingredients.json')
     }
   })
   .catch(() => {
+    console.error('Failed to load the Open Food Facts taxonomy:', err.message);
     taxonomy = null;
   });
 
