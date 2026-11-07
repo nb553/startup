@@ -12,6 +12,7 @@ app.use(cookieParser());
 
 // In-memory data (lost when the service restarts)
 let users = [];
+let households = [];
 
 // All service endpoints live under /api
 const apiRouter = express.Router();
@@ -68,6 +69,95 @@ apiRouter.get('/user/me', verifyAuth, (req, res) => {
   res.send({ email: req.user.email });
 });
 
+// Get my allergen list
+apiRouter.get('/my/allergens', verifyAuth, (req, res) => {
+  res.send(req.user.allergens);
+});
+
+// Replace my allergen list
+apiRouter.put('/my/allergens', verifyAuth, (req, res) => {
+  req.user.allergens = req.body;
+  res.send(req.user.allergens);
+});
+
+// Get the households I belong to
+apiRouter.get('/households', verifyAuth, (req, res) => {
+  res.send(households.filter((h) => h.members.includes(req.user.email)));
+});
+
+// Create a household
+apiRouter.post('/households', verifyAuth, (req, res) => {
+  const household = {
+    id: uuid.v4(),
+    name: req.body.name,
+    code: uuid.v4().slice(0, 8),
+    members: [req.user.email],
+    recipes: [],
+  };
+  households.push(household);
+  res.status(201).send(household);
+});
+
+// Join a household by invite code
+apiRouter.post('/households/join', verifyAuth, (req, res) => {
+  const household = households.find((h) => h.code === req.body.code);
+  if (!household) {
+    res.status(404).send({ msg: 'Household not found' });
+    return;
+  }
+  if (!household.members.includes(req.user.email)) {
+    household.members.push(req.user.email);
+  }
+  res.send(household);
+});
+
+// Find a household by id, but only if the user belongs to it
+function findMyHousehold(req) {
+  const household = households.find((h) => h.id === req.params.id);
+  if (!household || !household.members.includes(req.user.email)) {
+    return null;
+  }
+  return household;
+}
+
+// Get a household's recipes
+apiRouter.get('/households/:id/recipes', verifyAuth, (req, res) => {
+  const household = findMyHousehold(req);
+  if (!household) {
+    res.status(403).send({ msg: 'Not a member of this household' });
+    return;
+  }
+  res.send(household.recipes);
+});
+
+// Add a recipe to a household
+apiRouter.post('/households/:id/recipes', verifyAuth, (req, res) => {
+  const household = findMyHousehold(req);
+  if (!household) {
+    res.status(403).send({ msg: 'Not a member of this household' });
+    return;
+  }
+  const recipe = {
+    id: uuid.v4(),
+    name: req.body.name,
+    ingredients: req.body.ingredients,
+  };
+  household.recipes.push(recipe);
+  res.status(201).send(recipe);
+});
+
+// Delete a recipe from a household
+apiRouter.delete('/households/:id/recipes/:recipeId', verifyAuth, (req, res) => {
+  const household = findMyHousehold(req);
+  if (!household) {
+    res.status(403).send({ msg: 'Not a member of this household' });
+    return;
+  }
+  household.recipes = household.recipes.filter((r) => r.id !== req.params.recipeId);
+  res.status(204).end();
+});
+
+
 // Serve the frontend files once deployed
 app.use(express.static('public'));
 
@@ -88,6 +178,7 @@ async function createUser(email, password) {
     email: email,
     password: passwordHash,
     token: uuid.v4(),
+    allergens: []
   };
   users.push(user);
 
