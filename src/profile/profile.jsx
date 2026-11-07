@@ -1,14 +1,5 @@
 import React, { useState, useEffect } from 'react';
 
-const initialAllergens = [
-  { id: 'a1', name: 'Peanuts', level: 'Severe allergy' },
-  { id: 'a2', name: 'Treenuts', level: 'Severe allergy' },
-  { id: 'a3', name: 'Legumes', level: 'Severe allergy' },
-  { id: 'a4', name: 'Chocolate', level: 'Severe allergy' },
-  { id: 'a5', name: 'Carrots', level: 'Severe allergy' },
-  { id: 'a6', name: 'Chicken', level: 'Severe allergy' },
-];
-
 const initialHouseholds = [
   {
     id: 'h1',
@@ -51,17 +42,36 @@ export function Profile({ userName }) {
   useEffect(() => {
     setEmail(localStorage.getItem('userEmail') || '');
   }, []);
-  const [allergens, setAllergens] = useState(() => {
-    const saved = localStorage.getItem('myAllergens');
-    return saved ? JSON.parse(saved) : initialAllergens;
-  });
+  const [allergens, setAllergens] = useState([]);
+  const [allergensLoaded, setAllergensLoaded] = useState(false);
+
+  useEffect(() => {
+    fetch('/api/my/allergens')
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data) => {
+        setAllergens(data);
+        setAllergensLoaded(true);
+      })
+      .catch(() => setAllergensLoaded(true));
+  }, []);
+
   const [newAllergen, setNewAllergen] = useState('');
   const [newLevel, setNewLevel] = useState('Severe allergy');
 
-  const [goals, setGoals] = useState(() => {
-    const saved = localStorage.getItem('nutritionGoals');
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [goals, setGoals] = useState([]);
+  const [goalsLoaded, setGoalsLoaded] = useState(false);
+
+  useEffect(() => {
+    fetch('/api/my/goals')
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data) => {
+        setGoals(data);
+        setGoalsLoaded(true);
+      })
+      .catch(() => setGoalsLoaded(true));
+  }, []);
+
+
   const [nutrient, setNutrient] = useState('Sodium (mg)');
   const [goalType, setGoalType] = useState('Maximum limit per day');
   const [goalAmount, setGoalAmount] = useState('');
@@ -75,12 +85,24 @@ export function Profile({ userName }) {
   const [joinMessage, setJoinMessage] = useState('');
 
   useEffect(() => {
-    localStorage.setItem('myAllergens', JSON.stringify(allergens));
-  }, [allergens]);
+    if (!allergensLoaded) return;
+    fetch('/api/my/allergens', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(allergens),
+    }).catch(() => {});
+  }, [allergens, allergensLoaded]);
+
 
   useEffect(() => {
-    localStorage.setItem('nutritionGoals', JSON.stringify(goals));
-  }, [goals]);
+    if (!goalsLoaded) return;
+    fetch('/api/my/goals', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(goals),
+    }).catch(() => {});
+  }, [goals, goalsLoaded]);
+
 
   useEffect(() => {
     localStorage.setItem('households', JSON.stringify(households));
@@ -89,7 +111,7 @@ export function Profile({ userName }) {
   function handleAddAllergen(e) {
     e.preventDefault();
     if (!newAllergen.trim()) return;
-    setAllergens((prev) => [...prev, { id: Date.now(), name: newAllergen.trim(), level: newLevel }]);
+    setAllergens((prev) => [...prev, { id: crypto.radomUUID(), name: newAllergen.trim(), level: newLevel }]);
     setNewAllergen('');
     setNewLevel('Severe allergy');
   }

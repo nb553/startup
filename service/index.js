@@ -80,6 +80,18 @@ apiRouter.put('/my/allergens', verifyAuth, (req, res) => {
   res.send(req.user.allergens);
 });
 
+// Get my nutrition goals
+apiRouter.get('/my/goals', verifyAuth, (req, res) => {
+  res.send(req.user.goals);
+});
+
+// Replace my nutrition goals
+apiRouter.put('/my/goals', verifyAuth, (req, res) => {
+  req.user.goals = req.body;
+  res.send(req.user.goals);
+});
+
+
 // Get the households I belong to
 apiRouter.get('/households', verifyAuth, (req, res) => {
   res.send(households.filter((h) => h.members.includes(req.user.email)));
@@ -178,7 +190,8 @@ async function createUser(email, password) {
     email: email,
     password: passwordHash,
     token: uuid.v4(),
-    allergens: []
+    allergens: [],
+    goals: []
   };
   users.push(user);
 
