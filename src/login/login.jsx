@@ -7,7 +7,7 @@ export function Login({ setUserName }) {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
 
     if (!email || !password) {
@@ -15,17 +15,25 @@ export function Login({ setUserName }) {
       return;
     }
 
-    // Mocked auth: there is no real backend yet, so we just check that a
-    // name was previously saved during registration in this browser, and
-    // fall back to using the email itself if not. This will be replaced
-    // with a real authentication service call in a later deliverable.
-    const existingName = localStorage.getItem('userName');
-    const displayName = existingName || email.split('@')[0];
+    const res = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
 
-    localStorage.setItem('userEmail', email);
-    setUserName(displayName);
-    navigate('/dashboard');
+    if (res.ok) {
+      const existingName = localStorage.getItem('userName');
+      const displayName = existingName || email.split('@')[0];
+      localStorage.setItem('userName', displayName);
+      localStorage.setItem('userEmail', email);
+      setUserName(displayName);
+      navigate('/dashboard');
+    } else {
+      const body = await res.json();
+      setError(body.msg || 'Login failed.');
   }
+}
+
 
   return (
     <main className="flex-1 max-w-2xl mx-auto w-full p-4 md:p-8 flex flex-col gap-6">

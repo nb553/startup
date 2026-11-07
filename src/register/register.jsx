@@ -5,19 +5,29 @@ export function Register({ setUserName }) {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
 
-    // Mocked account creation: no real backend yet, so we just persist the
-    // name/email to this browser's localStorage. A real authentication
-    // service call replaces this in a later deliverable.
-    localStorage.setItem('userName', fullName);
-    localStorage.setItem('userEmail', email);
-    setUserName(fullName);
-    navigate('/dashboard');
+    const res = await fetch('/api/auth/create', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
+
+    if (res.ok) {
+      localStorage.setItem('userName', fullName);
+      localStorage.setItem('userEmail', email);
+      setUserName(fullName);
+      navigate('/dashboard');
+    } else {
+      const body = await res.json();
+      setError(body.msg || 'Registration failed.');
+    }
   }
+
 
   return (
     <main className="flex-1 max-w-2xl mx-auto w-full p-4 md:p-8 flex flex-col gap-6">
@@ -63,6 +73,7 @@ export function Register({ setUserName }) {
             onChange={(e) => setPassword(e.target.value)}
           />
         </div>
+        {error && <p className="flagged">{error}</p>}
         <button type="submit" className="btn-primary self-start">Create Account</button>
       </form>
 

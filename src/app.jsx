@@ -20,14 +20,18 @@ function AppContent() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (userName) {
-      localStorage.setItem('userName', userName);
-    } else {
-      localStorage.removeItem('userName');
-    }
-  }, [userName]);
+    fetch('/api/user/me')
+      .then((res) => {
+        if (!res.ok) {
+          localStorage.removeItem('userName');
+          setUserName('');
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   function logout() {
+    fetch('/api/auth/logout', { method: 'DELETE' }).catch(() => {});
     localStorage.removeItem('userName');
     localStorage.removeItem('userEmail');
     setUserName('');
