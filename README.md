@@ -140,14 +140,15 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 
 For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
 
-- [ ] I completed the prerequisites for this deliverable (Simon deployed, GitHub link, Git commits)
-- [ ] **Node.js/Express HTTP service** - I did not complete this part of the deliverable.
-- [ ] **Static middleware for frontend** - I did not complete this part of the deliverable.
-- [ ] **Calls to third party endpoints** - I did not complete this part of the deliverable.
-- [ ] **Backend service endpoints** - I did not complete this part of the deliverable.
-- [ ] **Frontend calls service endpoints** - I did not complete this part of the deliverable.
-- [ ] **Supports registration, login, logout, and restricted endpoint** - I did not complete this part of the deliverable.
-- [ ] **Uses BCrypt to hash passwords** - I did not complete this part of the deliverable.
+- [x] I completed the prerequisites for this deliverable (Simon deployed, GitHub link, Git commits)
+- [x] **Node.js/Express HTTP service** - Built an Express service in the `service/` folder running on port 4000, deployed under PM2 on my server.
+- [x] **Static middleware for frontend** - Express serves the built frontend with `express.static`, with a fallback to `index.html` for client-side routes.
+- [x] **Calls to third party endpoints** - Food Lookup calls Open Food Facts: name search is proxied through my service (that host sends no CORS headers for browsers), product details are fetched by barcode, and my `/api/food/explain` endpoint breaks ingredients down using the Open Food Facts ingredients taxonomy.
+- [x] **Backend service endpoints** - Auth endpoints plus per-account allergen and nutrition goal endpoints (`GET`/`PUT /api/my/allergens`, `GET`/`PUT /api/my/goals`), household and recipe endpoints with invite codes and membership checks, and the food search/explain endpoints.
+- [x] **Frontend calls service endpoints** - Login, register, logout, and the session check call the auth endpoints; the Profile page loads and saves allergens and goals through the service; Lookup uses the food endpoints.
+- [x] **Supports registration, login, logout, and restricted endpoint** - Register, login, and logout all work with a token cookie; `GET /api/user/me` rejects unauthenticated requests with 401. Login with an email that has no account fails instead of creating one.
+- [x] **Uses BCrypt to hash passwords** - Passwords are hashed with bcrypt (cost 10) when an account is created and compared with bcrypt at login; plain-text passwords are never stored.
+
 
 ## 🚀 DB deliverable
 
