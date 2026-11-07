@@ -90,6 +90,24 @@ export const ingredientKnowledge = {
   'iceberg lettuce': { what: 'Lettuce' },
   'cheddar cheese': { what: 'Cheese', partOf: ['dairy'] },
   'crunchy taco shell': { what: 'Fried corn tortilla shell' },
+  'natural flavouring': {
+    what: 'Flavoring taken from plant or animal source material (fruit, spice, herb, dairy, meat). The label does not say which source.',
+  },
+  'artificial flavouring': {
+    what: 'Flavoring produced by chemical synthesis rather than taken from a natural source. The label does not say what it contains.',
+  },
+  'flavouring': {
+    what: 'Added flavoring. The label does not say whether it is natural or artificial, or what it came from.',
+  },
+  'natural flavoring': {
+    what: 'Flavoring taken from plant or animal source material (fruit, spice, herb, dairy, meat). The label does not say which source.',
+  },
+  'artificial flavoring': {
+    what: 'Flavoring produced by chemical synthesis rather than taken from a natural source. The label does not say what it contains.',
+  },
+  'flavoring': {
+    what: 'Added flavoring. The label does not say whether it is natural or artificial, or what it came from.',
+  },
 };
 
 // Branded / packaged foods. Hard-coded mock API responses for now;
@@ -125,11 +143,24 @@ export function calculateNutritionTotals(lines) {
   return { totals, unknownCount };
 }
 
-// Looks up one ingredient name (any capitalization) and works out who
-// in the household it flags. A name matches a member's lists if the
-// name itself, anything in partOf, or anything in contains is on the
-// list. Entries marked 'derived' or 'check' come back as check-source
-// instead of severe / intolerance.
+// Natasha's allergy terms, expanded to the words those allergens
+// actually appear under in outside data. This is her household data
+// defining its own terms — the same kind of declaration as the
+// vanilla-extract partOf rule in the knowledge entries above.
+const termExpansions = {
+  legumes: ['soybeans', 'soybean', 'soya', 'soy'],
+  chocolate: ['cocoa', 'cacao'],
+};
+
+// Label words that name an unspecified mixture. Anything could be
+// hiding in them, so they check-flag every member with a severe
+// allergy instead of passing silently.
+const vagueTerms = [
+  'vegetable oil', 'spice', 'spices', 'flavouring', 'flavoring',
+  'flavours', 'flavors', 'natural flavouring', 'artificial flavouring',
+  'natural flavoring', 'artificial flavoring', 'seasoning', 'seasonings',
+];
+
 export function getIngredientFlags(rawName, extra = {}) {
   const key = rawName.trim().toLowerCase();
   let matchedKey = ingredientKnowledge[key] ? key : null;
@@ -146,12 +177,20 @@ export function getIngredientFlags(rawName, extra = {}) {
   const strongKeys = [key, ...ancestors];
   if (matchedKey) strongKeys.push(matchedKey);
   if (entry) strongKeys.push(...(entry.partOf || []), ...(entry.contains || []));
+  const texts = [key, ...ancestors];
   for (const member of householdMembers) {
     for (const term of [...member.severe, ...member.caution]) {
-      if (key.includes(term) || term.includes(key)) strongKeys.push(term);
+      const expanded = termExpansions[term] || [];
+      if (
+        texts.some((t) => t.includes(term) || term.includes(t)) ||
+        expanded.some((w) => texts.some((t) => t.includes(w)))
+      ) {
+        strongKeys.push(term);
+      }
     }
   }
-  const hits = (list) => strongKeys.some((k) => list.includes(k));
+  const norm = (s) => s.replace(/s$/, '');
+  const hits = (list) => strongKeys.some((k) => list.some((t) => norm(t) === norm(k)));
 
   if (entry && entry.match === 'check') {
     return { key, entry, severe: [], caution: [], check: entry.checkFor || [] };
@@ -166,25 +205,25 @@ export function getIngredientFlags(rawName, extra = {}) {
   const severe = householdMembers.filter((m) => hits(m.severe)).map((m) => m.name);
   const caution = householdMembers.filter((m) => hits(m.caution)).map((m) => m.name);
 
-  // Loose family matches (a shared word with an allergen term) and
-  // hidden-term matches become check-source flags rather than full
-  // flags: related enough to verify, not certain.
   const words = (s) =>
     s.toLowerCase().replace(/s\b/g, '').split(/[^a-z]+/).filter((w) => w.length >= 3);
   const looseMatch = (term) => {
     const termWords = words(term);
-    return [key, ...ancestors].some((k) => {
+    return texts.some((k) => {
       const kWords = words(k);
       return termWords.some((w) => kWords.includes(w));
     });
   };
   const checkSet = new Set();
+  const isVague = vagueTerms.some((v) => key === v || key.startsWith(v));
   for (const member of householdMembers) {
     if (severe.includes(member.name) || caution.includes(member.name)) continue;
     const memberTerms = [...member.severe, ...member.caution];
     if (memberTerms.some((t) => looseMatch(t))) checkSet.add(member.name);
     if ((extra.hiddenTerms || []).some((t) => memberTerms.includes(t))) checkSet.add(member.name);
+    if (isVague && member.severe.length > 0) checkSet.add(member.name);
   }
 
   return { key, entry, severe, caution, check: [...checkSet] };
 }
+

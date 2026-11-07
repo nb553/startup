@@ -69,7 +69,7 @@ function RecipeCard({ recipe }) {
               )}
               {severeFor && <> &mdash; severe allergy ({severeFor})</>}
               {cautionFor && <> &mdash; intolerance ({cautionFor})</>}
-              {checkFor && <> &mdash; check source ({checkFor})</>}
+              {checkFor && <> &mdash; may hide allergens ({checkFor})</>}
             </li>
           );
         })}

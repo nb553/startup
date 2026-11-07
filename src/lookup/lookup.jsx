@@ -60,6 +60,21 @@ async function loadFirstUsableProduct(candidates) {
   return { product: null, name: '', problem };
 }
 
+// E-numbers are the EU's numbering for food additives, grouped by
+// job: the hundreds digit says what the chemical is for.
+function additiveInfo(name) {
+  const m = name.toLowerCase().match(/^e(\d{3,4})[a-z]?$/);
+  if (!m) return null;
+  const n = parseInt(m[1], 10);
+  if (n >= 100 && n < 200) return 'colour';
+  if (n >= 200 && n < 300) return 'preservative';
+  if (n >= 300 && n < 400) return 'antioxidant / acidity regulator';
+  if (n >= 400 && n < 500) return 'thickener / emulsifier / stabiliser';
+  if (n >= 500 && n < 600) return 'acidity regulator / anti-caking agent';
+  if (n >= 600 && n < 700) return 'flavour enhancer';
+  if (n >= 900 && n < 1000) return 'sweetener / glazing agent';
+  return 'food additive';
+}
 
 // Splits a raw Open Food Facts label into real ingredients plus the
 // statement lines that aren't ingredients: "may contain" cross-contact
@@ -137,12 +152,15 @@ function offToResult(product, fallbackName) {
   const parsedList = (product.ingredients || []).filter((i) => i.id);
   const fromTaxonomy = parsedList.map((i) => i.id.replace(/^en:/, '').replace(/-/g, ' '));
   const ingredients = fromTaxonomy.length > 0 ? fromTaxonomy : parsed.ingredients;
-  const ingredientIds = fromTaxonomy.length > 0 ? parsedList.map((i) => i.id) : [];
+  const ingredientIds =
+    fromTaxonomy.length > 0
+      ? parsedList.map((i) => i.id)
+      : parsed.ingredients.map((name) => `en:${name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`);
   const { traces, declares } = parsed;
 
   return {
-    displayName: product.product_name || fallbackName,
-    serving: perServing ? product.serving_size || '1 serving' : '100g',
+    displayName: (product.product_name || fallbackName).replace(/\[[^\]]*\]/g, '').replace(/\s+/g, ' ').trim(),
+    serving: perServing ? (product.serving_size || '1 serving').replace(/\[[^\]]*\]/g, '').trim() : '100g',
     ingredients,
     traces,
     declares,
@@ -156,6 +174,23 @@ function offToResult(product, fallbackName) {
       fatG: get('fat') ?? 0,
     },
   };
+}
+
+function BottomTag({ name, flags }) {
+  return (
+    <span>
+      {name}
+      {flags.severe.length > 0 && (
+        <> <span className="flagged">Severe allergy — {flags.severe.join(', ')}</span></>
+      )}
+      {flags.severe.length === 0 && flags.caution.length > 0 && (
+        <> <span className="flagged-caution">Intolerance — {flags.caution.join(', ')}</span></>
+      )}
+      {flags.severe.length === 0 && flags.caution.length === 0 && flags.check.length > 0 && (
+        <> <span className="check-source">May hide allergens — {flags.check.join(', ')}</span></>
+      )}
+    </span>
+  );
 }
 
 
@@ -275,9 +310,20 @@ export function Lookup() {
     ? result.ingredients.map((name, i) => {
         const id = result.ingredientIds ? result.ingredientIds[i] : null;
         const info = id && result.ingredientInfo ? result.ingredientInfo[id] : null;
-        return { name, info, flags: getIngredientFlags(name, info || {}) };
+        const cleaned = info
+          ? [...new Set(info.ancestors.map((a) => a.replace(/ and fat$/, '')))].filter(
+              (a) => a.toLowerCase() !== name.toLowerCase()
+            )
+          : [];
+        const ancestors = cleaned.filter(
+          (a, idx) => !cleaned.slice(0, idx).some((b) => b.toLowerCase().includes(a.toLowerCase()))
+        );
+        const additive =
+          additiveInfo(name) || ancestors.map((a) => additiveInfo(a)).find(Boolean) || null;
+        return { name, info, ancestors, additive, flags: getIngredientFlags(name, info || {}) };
       })
     : [];
+
 
   const severeNames = [...new Set(allFlags.flatMap((f) => f.flags.severe))];
   const cautionNames = [...new Set(allFlags.flatMap((f) => f.flags.caution))];
@@ -288,6 +334,7 @@ export function Lookup() {
   const declareFlags = result && result.declares
     ? result.declares.map((name) => ({ name, flags: getIngredientFlags(name) }))
     : [];
+  const colourRows = allFlags.filter((f) => f.additive === 'colour');
   const nutrition = result ? result.nutritionPerServing : null;
   const saltG = nutrition ? ((nutrition.sodiumMg * 2.5) / 1000).toFixed(2) : null;
 
@@ -354,15 +401,17 @@ export function Lookup() {
                 </tr>
               </thead>
               <tbody>
-                {allFlags.map(({ name, info, flags }) => (
+                {allFlags.map(({ name, flags, ancestors, additive }) => (
                   <tr key={name} className="border-b border-[var(--navy)]/10">
                     <td className="py-1">{name}</td>
                     <td className="py-1">
                       {flags.entry
                         ? flags.entry.what
-                        : info && info.ancestors.length > 0
-                          ? `Family: ${info.ancestors.slice(0, 3).join(' → ')}`
-                          : 'Not in our ingredient knowledge yet'}
+                        : additive && additive !== 'colour'
+                          ? `Food additive — ${additive}`
+                          : ancestors.length > 0
+                            ? `Broader group: ${ancestors.slice(0, 2).join(' → ')}`
+                            : '—'}
                       {flags.entry && flags.entry.partOf && <> &mdash; part of: {flags.entry.partOf.join(', ')}</>}
                       {flags.entry && flags.entry.contains && <> &mdash; contains: {flags.entry.contains.join(', ')}</>}
                     </td>
@@ -372,52 +421,55 @@ export function Lookup() {
                       ) : flags.caution.length > 0 ? (
                         <span className="flagged-caution">Intolerance &mdash; {flags.caution.join(', ')}</span>
                       ) : flags.check.length > 0 ? (
-                        <span className="check-source">Check source &mdash; {flags.check.join(', ')}</span>
+                        <span className="check-source">May hide allergens &mdash; {flags.check.join(', ')}</span>
                       ) : (
                         'None'
                       )}
                     </td>
                   </tr>
-                ))}
+              ))}
               </tbody>
             </table>
           </div>
 
           {severeNames.length > 0 && <p>Not safe for: {severeNames.join(', ')} (severe allergy).</p>}
           {cautionNames.length > 0 && <p>Intolerance for: {cautionNames.join(', ')}. <span className="substitute">Suggested substitute: remove or swap the intolerance ingredients above.</span></p>}
-          {checkNames.length > 0 && <p>Check the source for: {checkNames.join(', ')}.</p>}
           {severeNames.length === 0 && cautionNames.length === 0 && checkNames.length === 0 && (
             <p>No household flags for this food.</p>
           )}
           {declareFlags.length > 0 && (
             <p>
               Label declares:{' '}
-              {declareFlags
-                .map(({ name, flags }) =>
-                  flags.severe.length > 0
-                    ? `${name} (severe allergy — ${flags.severe.join(', ')})`
-                    : flags.caution.length > 0
-                      ? `${name} (intolerance — ${flags.caution.join(', ')})`
-                      : name
-                )
-                .join(', ')}
+              {declareFlags.map(({ name, flags }, i) => (
+                <span key={name}>
+                  {i > 0 && ', '}
+                  <BottomTag name={name} flags={flags} />
+                </span>
+              ))}
             </p>
           )}
           {traceFlags.length > 0 && (
             <p>
               May contain (cross-contact):{' '}
-              {traceFlags
-                .map(({ name, flags }) =>
-                  flags.severe.length > 0
-                    ? `${name} (severe allergy — ${flags.severe.join(', ')})`
-                    : flags.caution.length > 0
-                      ? `${name} (intolerance — ${flags.caution.join(', ')})`
-                      : name
-                )
-                .join(', ')}
+              {traceFlags.map(({ name, flags }, i) => (
+                <span key={name}>
+                  {i > 0 && ', '}
+                  <BottomTag name={name} flags={flags} />
+                </span>
+              ))}
             </p>
           )}
-
+          {colourRows.length > 0 && (
+            <p>
+              Colours:{' '}
+              {colourRows.map(({ name, flags }, i) => (
+                <span key={name}>
+                  {i > 0 && ', '}
+                  <BottomTag name={name} flags={flags} />
+                </span>
+              ))}
+            </p>
+          )}
 
           <div className="mt-2 pt-2 border-t border-[var(--navy)]/10">
             <p className="font-bold text-sm">Nutrition (per {result.serving})</p>

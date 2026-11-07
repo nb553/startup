@@ -204,6 +204,7 @@ fetch('https://static.openfoodfacts.org/data/taxonomies/ingredients.json')
   });
 
 function taxonomyName(id) {
+  id = id.toLowerCase();
   const node = taxonomy && taxonomy[id];
   return node && node.name && node.name.en
     ? node.name.en
@@ -211,6 +212,7 @@ function taxonomyName(id) {
 }
 
 function taxonomyAncestors(id) {
+  id = id.toLowerCase();
   const names = [];
   const seen = new Set([id]);
   let frontier = [id];
@@ -231,11 +233,9 @@ function taxonomyAncestors(id) {
   return names;
 }
 
-// Household allergen terms that could be hiding inside a broad
-// category ingredient: terms appearing among its descendants in the
-// tree ("spice" -> "paprika").
 function taxonomyHiddenTerms(id, terms) {
   if (!taxonomy) return [];
+  id = id.toLowerCase();
   const found = [];
   const seen = new Set([id]);
   let frontier = [id];
@@ -258,6 +258,7 @@ function taxonomyHiddenTerms(id, terms) {
   }
   return found;
 }
+
 
 // Break down ingredients against the taxonomy: family chain for
 // each, plus household terms hiding inside broad categories.
