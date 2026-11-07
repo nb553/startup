@@ -130,28 +130,61 @@ export function calculateNutritionTotals(lines) {
 // name itself, anything in partOf, or anything in contains is on the
 // list. Entries marked 'derived' or 'check' come back as check-source
 // instead of severe / intolerance.
-export function getIngredientFlags(rawName) {
+export function getIngredientFlags(rawName, extra = {}) {
   const key = rawName.trim().toLowerCase();
-  const entry = ingredientKnowledge[key];
-  if (!entry) {
-    return { key, entry: null, severe: [], caution: [], check: [] };
+  let matchedKey = ingredientKnowledge[key] ? key : null;
+  if (!matchedKey) {
+    const candidates = Object.keys(ingredientKnowledge).filter(
+      (k) => key.includes(k) || k.includes(key)
+    );
+    candidates.sort((a, b) => b.length - a.length);
+    matchedKey = candidates[0] || null;
   }
-  const keys = [key, ...(entry.partOf || []), ...(entry.contains || [])];
-  const hits = (list) => keys.some((k) => list.includes(k));
-  if (entry.match === 'check') {
+  const entry = matchedKey ? ingredientKnowledge[matchedKey] : null;
+
+  const ancestors = (extra.ancestors || []).map((a) => a.toLowerCase());
+  const strongKeys = [key, ...ancestors];
+  if (matchedKey) strongKeys.push(matchedKey);
+  if (entry) strongKeys.push(...(entry.partOf || []), ...(entry.contains || []));
+  for (const member of householdMembers) {
+    for (const term of [...member.severe, ...member.caution]) {
+      if (key.includes(term) || term.includes(key)) strongKeys.push(term);
+    }
+  }
+  const hits = (list) => strongKeys.some((k) => list.includes(k));
+
+  if (entry && entry.match === 'check') {
     return { key, entry, severe: [], caution: [], check: entry.checkFor || [] };
   }
-  if (entry.match === 'derived') {
+  if (entry && entry.match === 'derived') {
     const check = householdMembers
       .filter((m) => hits(m.severe) || hits(m.caution))
       .map((m) => m.name);
     return { key, entry, severe: [], caution: [], check };
   }
-  return {
-    key,
-    entry,
-    severe: householdMembers.filter((m) => hits(m.severe)).map((m) => m.name),
-    caution: householdMembers.filter((m) => hits(m.caution)).map((m) => m.name),
-    check: [],
+
+  const severe = householdMembers.filter((m) => hits(m.severe)).map((m) => m.name);
+  const caution = householdMembers.filter((m) => hits(m.caution)).map((m) => m.name);
+
+  // Loose family matches (a shared word with an allergen term) and
+  // hidden-term matches become check-source flags rather than full
+  // flags: related enough to verify, not certain.
+  const words = (s) =>
+    s.toLowerCase().replace(/s\b/g, '').split(/[^a-z]+/).filter((w) => w.length >= 3);
+  const looseMatch = (term) => {
+    const termWords = words(term);
+    return [key, ...ancestors].some((k) => {
+      const kWords = words(k);
+      return termWords.some((w) => kWords.includes(w));
+    });
   };
+  const checkSet = new Set();
+  for (const member of householdMembers) {
+    if (severe.includes(member.name) || caution.includes(member.name)) continue;
+    const memberTerms = [...member.severe, ...member.caution];
+    if (memberTerms.some((t) => looseMatch(t))) checkSet.add(member.name);
+    if ((extra.hiddenTerms || []).some((t) => memberTerms.includes(t))) checkSet.add(member.name);
+  }
+
+  return { key, entry, severe, caution, check: [...checkSet] };
 }

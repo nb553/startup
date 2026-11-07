@@ -1,5 +1,163 @@
 import React, { useState } from 'react';
-import { brandedFoods, getIngredientFlags } from '../shared/ingredientKnowledge';
+import { brandedFoods, getIngredientFlags, householdMembers } from '../shared/ingredientKnowledge';
+
+// Open Food Facts has two different services we use:
+//  - search.openfoodfacts.org: free-text search by name (returns matches in "hits")
+//  - world.openfoodfacts.org/api/v2/product: full details for one barcode
+// Their /api/v2/search endpoint only supports structured filters and silently
+// ignores a typed search, so it can't be used to look a food up by name.
+const SEARCH_URL = 'https://search.openfoodfacts.org/search';
+const PRODUCT_URL = 'https://world.openfoodfacts.org/api/v2/product';
+
+// Open Food Facts is occasionally flaky, so one retry is built in before
+// we report it unavailable. On failure we also report WHY, so the message
+// shown (and the browser console) says what actually went wrong.
+async function fetchJson(url) {
+  let problem = 'unknown error';
+  for (let attempt = 0; attempt < 2; attempt++) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 8000);
+    try {
+      const res = await fetch(url, { signal: controller.signal });
+      clearTimeout(timer);
+      if (res.ok) return { data: await res.json(), problem: '' };
+      problem = `HTTP ${res.status}`;
+    } catch (err) {
+      clearTimeout(timer);
+      problem = err.name === 'AbortError' ? 'request timed out' : `${err.name}: ${err.message}`;
+    }
+  }
+  console.warn('Open Food Facts request failed:', problem, url);
+  return { data: null, problem };
+}
+
+
+// A search hit can be an empty placeholder entry (just a name and a barcode),
+// so before showing one we check that it has ingredients and nutrition.
+function hasUsableData(product) {
+  const n = product.nutriments || {};
+  const hasNutrition = n['energy-kcal_serving'] !== undefined || n['energy-kcal_100g'] !== undefined;
+  return Boolean((product.ingredients_text || '').trim()) && hasNutrition;
+}
+
+// Loads full details for up to a few candidate hits, in order, and returns
+// the first one that has usable data. Stops early so we make as few calls
+// as possible (Open Food Facts rate limits requests).
+async function loadFirstUsableProduct(candidates) {
+  let problem = '';
+  for (const candidate of candidates) {
+    const { data, problem: p } = await fetchJson(
+      `${PRODUCT_URL}/${candidate.code}.json?fields=product_name,ingredients_text,nutriments,serving_size,allergens_tags,traces_tags,ingredients`
+    );
+    if (!data || !data.product) {
+      problem = p || problem;
+      continue;
+    }
+    if (hasUsableData(data.product)) {
+      return { product: data.product, name: candidate.product_name, problem: '' };
+    }
+  }
+  return { product: null, name: '', problem };
+}
+
+
+// Splits a raw Open Food Facts label into real ingredients plus the
+// statement lines that aren't ingredients: "may contain" cross-contact
+// warnings and the label's own allergen declarations.
+function parseOffLabel(product) {
+  let text = product.ingredients_text || '';
+  const traces = [];
+  const declares = [];
+
+  const addItems = (list, chunk) => {
+    chunk
+      .split(/,| and /)
+      .map((s) => s.trim().replace(/\.$/, ''))
+      .filter(Boolean)
+      .forEach((item) => list.push(item));
+  };
+
+  text = text.replace(/may contain ([^.]*)\.?/gi, (m, chunk) => {
+    addItems(traces, chunk);
+    return '';
+  });
+
+  // Split on commas/semicolons outside parentheses, so
+  // "raising agents (500, 503)" stays one ingredient.
+  const segments = [];
+  let depth = 0;
+  let current = '';
+  for (const ch of text) {
+    if (ch === '(') depth++;
+    if (ch === ')') depth = Math.max(0, depth - 1);
+    if ((ch === ',' || ch === ';') && depth === 0) {
+      segments.push(current);
+      current = '';
+    } else {
+      current += ch;
+    }
+  }
+  segments.push(current);
+
+  const ingredients = [];
+  for (const rawSegment of segments) {
+    const segment = rawSegment.trim().replace(/\.$/, '');
+    if (!segment) continue;
+    const lower = segment.toLowerCase();
+    if (lower.startsWith('allergen statement')) {
+      const after = segment.slice(lower.indexOf('contains') + 'contains'.length).trim().replace(/^:/, '');
+      addItems(declares, after);
+      continue;
+    }
+    if (lower.startsWith('best before') || lower.startsWith('use by')) continue;
+    if (lower.startsWith('may contain')) {
+      addItems(traces, segment.slice('may contain'.length));
+      continue;
+    }
+    ingredients.push(segment);
+  }
+
+  for (const tag of product.traces_tags || []) {
+    traces.push(tag.replace(/^en:/, '').replace(/-/g, ' '));
+  }
+  for (const tag of product.allergens_tags || []) {
+    declares.push(tag.replace(/^en:/, '').replace(/-/g, ' '));
+  }
+
+  return { ingredients, traces: [...new Set(traces)], declares: [...new Set(declares)] };
+}
+
+
+function offToResult(product, fallbackName) {
+  const n = product.nutriments || {};
+  const perServing = n['energy-kcal_serving'] !== undefined;
+  const get = (base) => (perServing ? n[`${base}_serving`] : n[`${base}_100g`]);
+  const sodiumG = get('sodium');
+  const parsed = parseOffLabel(product);
+  const parsedList = (product.ingredients || []).filter((i) => i.id);
+  const fromTaxonomy = parsedList.map((i) => i.id.replace(/^en:/, '').replace(/-/g, ' '));
+  const ingredients = fromTaxonomy.length > 0 ? fromTaxonomy : parsed.ingredients;
+  const ingredientIds = fromTaxonomy.length > 0 ? parsedList.map((i) => i.id) : [];
+  const { traces, declares } = parsed;
+
+  return {
+    displayName: product.product_name || fallbackName,
+    serving: perServing ? product.serving_size || '1 serving' : '100g',
+    ingredients,
+    traces,
+    declares,
+    ingredientIds,
+    nutritionPerServing: {
+      sodiumMg: sodiumG !== undefined ? Math.round(sodiumG * 1000) : 0,
+      calories: Math.round(get('energy-kcal') || 0),
+      sugarG: get('sugars') ?? 0,
+      fiberG: get('fiber') ?? 0,
+      proteinG: get('proteins') ?? 0,
+      fatG: get('fat') ?? 0,
+    },
+  };
+}
+
 
 export function Lookup() {
   const [query, setQuery] = useState('');
@@ -7,6 +165,7 @@ export function Lookup() {
   const [message, setMessage] = useState('');
   const [photoName, setPhotoName] = useState('');
   const [isScanning, setIsScanning] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
 
   function findFood(text) {
     const key = text.trim().toLowerCase();
@@ -16,24 +175,79 @@ export function Lookup() {
     );
   }
 
-  function handleSearch(e) {
+  async function handleSearch(e) {
     e.preventDefault();
     if (!query.trim()) return;
 
-    // Mocked food API: branded foods come from the shared brandedFoods
-    // data for now. A real nutrition API replaces this lookup in the
-    // Service deliverable.
-    const food = findFood(query);
-    if (food) {
-      setResult(food);
+    // Local branded foods first: our curated entries answer instantly.
+    const local = findFood(query);
+    if (local) {
+      setResult(local);
       setMessage('');
-    } else {
-      setResult(null);
-      setMessage(
-        `"${query}" isn't in our food data yet. Branded foods will be pulled from a nutrition API in a later deliverable.`
-      );
+      return;
     }
+
+    setIsSearching(true);
+    setResult(null);
+    setMessage('');
+
+    // Step 1: free-text search for the name that was typed.
+    const { data: searchData, problem: searchProblem } = await fetchJson(
+      `/api/food/search?q=${encodeURIComponent(query.trim())}`
+    );
+
+    if (!searchData) {
+      setMessage(`"${query}" isn't in our food data yet, and the live lookup is unavailable right now (${searchProblem}).`);
+      setIsSearching(false);
+      return;
+    }
+
+    // Search ranking is loose, so only consider hits whose name actually
+    // matches what was typed, then rank them by closeness: exact name
+    // first, then shortest name, so the plain product beats variants.
+    const q = query.trim().toLowerCase();
+    const hits = (searchData.hits || []).filter((h) => h.code && h.product_name);
+    const named = hits.filter((h) => h.product_name.toLowerCase().includes(q));
+    const loose = hits.filter((h) => h.product_name.toLowerCase().includes(q.split(' ')[0]));
+    const pool = (named.length > 0 ? named : loose).slice(0, 5);
+    const candidates = [...pool].sort((a, b) => {
+      const an = a.product_name.toLowerCase();
+      const bn = b.product_name.toLowerCase();
+      const aExact = an === q ? 0 : 1;
+      const bExact = bn === q ? 0 : 1;
+      return aExact - bExact || an.length - bn.length;
+    });
+
+    if (candidates.length === 0) {
+      setMessage(`"${query}" isn't in our food data yet, and Open Food Facts has no match for it either.`);
+      setIsSearching(false);
+      return;
+    }
+
+    // Step 2: load full ingredients and nutrition, skipping empty entries.
+    const { product, name, problem } = await loadFirstUsableProduct(candidates);
+
+    if (product) {
+      const base = offToResult(product, name);
+      setResult(base);
+      setIsSearching(false);
+      // The taxonomy breakdown fills in when it returns — it never
+      // blocks the result card itself.
+      if (base.ingredientIds.length > 0) {
+        const terms = [...new Set(householdMembers.flatMap((m) => [...m.severe, ...m.caution]))].join(',');
+        const { data: info } = await fetchJson(
+          `/api/food/explain?ids=${encodeURIComponent(base.ingredientIds.join(','))}&terms=${encodeURIComponent(terms)}`
+        );
+        if (info) setResult({ ...base, ingredientInfo: info });
+      }
+    } else if (problem) {
+      setMessage(`Found "${candidates[0].product_name}", but couldn't load its details right now (${problem}).`);
+    } else {
+      setMessage(`Found matches for "${query}" on Open Food Facts, but none of them have ingredient and nutrition data yet.`);
+    }
+    setIsSearching(false);
   }
+
 
   function handleScan(e) {
     e.preventDefault();
@@ -58,11 +272,22 @@ export function Lookup() {
   }
 
   const allFlags = result
-    ? result.ingredients.map((name) => ({ name, flags: getIngredientFlags(name) }))
+    ? result.ingredients.map((name, i) => {
+        const id = result.ingredientIds ? result.ingredientIds[i] : null;
+        const info = id && result.ingredientInfo ? result.ingredientInfo[id] : null;
+        return { name, info, flags: getIngredientFlags(name, info || {}) };
+      })
     : [];
+
   const severeNames = [...new Set(allFlags.flatMap((f) => f.flags.severe))];
   const cautionNames = [...new Set(allFlags.flatMap((f) => f.flags.caution))];
   const checkNames = [...new Set(allFlags.flatMap((f) => f.flags.check))];
+  const traceFlags = result && result.traces
+    ? result.traces.map((name) => ({ name, flags: getIngredientFlags(name) }))
+    : [];
+  const declareFlags = result && result.declares
+    ? result.declares.map((name) => ({ name, flags: getIngredientFlags(name) }))
+    : [];
   const nutrition = result ? result.nutritionPerServing : null;
   const saltG = nutrition ? ((nutrition.sodiumMg * 2.5) / 1000).toFixed(2) : null;
 
@@ -85,7 +310,9 @@ export function Lookup() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
             />
-            <button type="submit" className="btn-primary self-start">Search</button>
+            <button type="submit" className="btn-primary self-start" disabled={isSearching}>
+              {isSearching ? 'Searching…' : 'Search'}
+            </button>
           </form>
         </section>
 
@@ -127,11 +354,15 @@ export function Lookup() {
                 </tr>
               </thead>
               <tbody>
-                {allFlags.map(({ name, flags }) => (
+                {allFlags.map(({ name, info, flags }) => (
                   <tr key={name} className="border-b border-[var(--navy)]/10">
                     <td className="py-1">{name}</td>
                     <td className="py-1">
-                      {flags.entry ? flags.entry.what : 'Not in our ingredient knowledge yet'}
+                      {flags.entry
+                        ? flags.entry.what
+                        : info && info.ancestors.length > 0
+                          ? `Family: ${info.ancestors.slice(0, 3).join(' → ')}`
+                          : 'Not in our ingredient knowledge yet'}
                       {flags.entry && flags.entry.partOf && <> &mdash; part of: {flags.entry.partOf.join(', ')}</>}
                       {flags.entry && flags.entry.contains && <> &mdash; contains: {flags.entry.contains.join(', ')}</>}
                     </td>
@@ -158,6 +389,35 @@ export function Lookup() {
           {severeNames.length === 0 && cautionNames.length === 0 && checkNames.length === 0 && (
             <p>No household flags for this food.</p>
           )}
+          {declareFlags.length > 0 && (
+            <p>
+              Label declares:{' '}
+              {declareFlags
+                .map(({ name, flags }) =>
+                  flags.severe.length > 0
+                    ? `${name} (severe allergy — ${flags.severe.join(', ')})`
+                    : flags.caution.length > 0
+                      ? `${name} (intolerance — ${flags.caution.join(', ')})`
+                      : name
+                )
+                .join(', ')}
+            </p>
+          )}
+          {traceFlags.length > 0 && (
+            <p>
+              May contain (cross-contact):{' '}
+              {traceFlags
+                .map(({ name, flags }) =>
+                  flags.severe.length > 0
+                    ? `${name} (severe allergy — ${flags.severe.join(', ')})`
+                    : flags.caution.length > 0
+                      ? `${name} (intolerance — ${flags.caution.join(', ')})`
+                      : name
+                )
+                .join(', ')}
+            </p>
+          )}
+
 
           <div className="mt-2 pt-2 border-t border-[var(--navy)]/10">
             <p className="font-bold text-sm">Nutrition (per {result.serving})</p>

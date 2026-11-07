@@ -91,6 +91,19 @@ apiRouter.put('/my/goals', verifyAuth, (req, res) => {
   res.send(req.user.goals);
 });
 
+// Food search proxy: search.openfoodfacts.org sends no CORS header, so
+// browsers can't read it directly — the server makes that one call.
+apiRouter.get('/food/search', verifyAuth, async (req, res) => {
+  try {
+    const r = await fetch(
+      `https://search.openfoodfacts.org/search?q=${encodeURIComponent(req.query.q || '')}&page_size=10&fields=code,product_name`
+    );
+    if (!r.ok) return res.status(502).send({ msg: 'Food search unavailable' });
+    res.send(await r.json());
+  } catch {
+    res.status(502).send({ msg: 'Food search unavailable' });
+  }
+});
 
 // Get the households I belong to
 apiRouter.get('/households', verifyAuth, (req, res) => {
@@ -167,6 +180,102 @@ apiRouter.delete('/households/:id/recipes/:recipeId', verifyAuth, (req, res) => 
   }
   household.recipes = household.recipes.filter((r) => r.id !== req.params.recipeId);
   res.status(204).end();
+});
+
+// Open Food Facts ingredients taxonomy: their maintained family tree
+// of ingredients (whey -> dairy, spice -> paprika, ...). Loaded once
+// at startup so Lookup can break down hard-to-read ingredient names
+// without any hand-written synonym lists.
+let taxonomy = null;
+let taxonomyChildren = {};
+fetch('https://static.openfoodfacts.org/data/taxonomies/ingredients.json')
+  .then((r) => r.json())
+  .then((data) => {
+    taxonomy = data;
+    for (const [id, node] of Object.entries(data)) {
+      for (const parent of node.parents || []) {
+        if (!taxonomyChildren[parent]) taxonomyChildren[parent] = [];
+        taxonomyChildren[parent].push(id);
+      }
+    }
+  })
+  .catch(() => {
+    taxonomy = null;
+  });
+
+function taxonomyName(id) {
+  const node = taxonomy && taxonomy[id];
+  return node && node.name && node.name.en
+    ? node.name.en
+    : id.replace(/^en:/, '').replace(/-/g, ' ');
+}
+
+function taxonomyAncestors(id) {
+  const names = [];
+  const seen = new Set([id]);
+  let frontier = [id];
+  while (frontier.length > 0) {
+    const next = [];
+    for (const current of frontier) {
+      const node = taxonomy && taxonomy[current];
+      for (const parent of (node && node.parents) || []) {
+        if (!seen.has(parent)) {
+          seen.add(parent);
+          names.push(taxonomyName(parent));
+          next.push(parent);
+        }
+      }
+    }
+    frontier = next;
+  }
+  return names;
+}
+
+// Household allergen terms that could be hiding inside a broad
+// category ingredient: terms appearing among its descendants in the
+// tree ("spice" -> "paprika").
+function taxonomyHiddenTerms(id, terms) {
+  if (!taxonomy) return [];
+  const found = [];
+  const seen = new Set([id]);
+  let frontier = [id];
+  while (frontier.length > 0 && seen.size < 500) {
+    const next = [];
+    for (const current of frontier) {
+      for (const child of taxonomyChildren[current] || []) {
+        if (seen.has(child)) continue;
+        seen.add(child);
+        next.push(child);
+        const childName = taxonomyName(child).toLowerCase();
+        for (const term of terms) {
+          if ((childName.includes(term) || term.includes(childName)) && !found.includes(term)) {
+            found.push(term);
+          }
+        }
+      }
+    }
+    frontier = next;
+  }
+  return found;
+}
+
+// Break down ingredients against the taxonomy: family chain for
+// each, plus household terms hiding inside broad categories.
+apiRouter.get('/food/explain', verifyAuth, (req, res) => {
+  const ids = (req.query.ids || '').split(',').filter(Boolean);
+  const terms = (req.query.terms || '')
+    .split(',')
+    .filter(Boolean)
+    .map((t) => t.toLowerCase());
+  const out = {};
+  for (const id of ids) {
+    out[id] = {
+      name: taxonomyName(id),
+      ancestors: taxonomyAncestors(id),
+      hiddenTerms: taxonomyHiddenTerms(id, terms),
+    };
+  }
+  res.send(out);
 });
 
 
