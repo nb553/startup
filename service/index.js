@@ -2,6 +2,7 @@ const express = require('express');
 const cookieParser = require('cookie-parser');
 const bcrypt = require('bcryptjs');
 const uuid = require('uuid');
+const DB = require('./database.js');
 const app = express();
 
 const authCookieName = 'token';
@@ -10,9 +11,7 @@ const authCookieName = 'token';
 app.use(express.json());
 app.use(cookieParser());
 
-// In-memory data (lost when the service restarts)
-let users = [];
-let households = [];
+// Application data lives in MongoDB now (see database.js)
 
 // All service endpoints live under /api
 const apiRouter = express.Router();
@@ -20,7 +19,7 @@ app.use(`/api`, apiRouter);
 
 // CreateAuth: register a new user
 apiRouter.post('/auth/create', async (req, res) => {
-  if (await findUser('email', req.body.email)) {
+  if (await DB.getUser(req.body.email)) {
     res.status(409).send({ msg: 'Existing user' });
   } else {
     const user = await createUser(req.body.email, req.body.password);
@@ -31,10 +30,11 @@ apiRouter.post('/auth/create', async (req, res) => {
 
 // GetAuth: login an existing user
 apiRouter.post('/auth/login', async (req, res) => {
-  const user = await findUser('email', req.body.email);
+  const user = await DB.getUser(req.body.email);
   if (user) {
     if (await bcrypt.compare(req.body.password, user.password)) {
       user.token = uuid.v4();
+      await DB.updateUser(user);
       setAuthCookie(res, user.token);
       res.send({ email: user.email });
       return;
@@ -45,9 +45,9 @@ apiRouter.post('/auth/login', async (req, res) => {
 
 // DeleteAuth: logout a user
 apiRouter.delete('/auth/logout', async (req, res) => {
-  const user = await findUser('token', req.cookies[authCookieName]);
+  const user = await DB.getUserByToken(req.cookies[authCookieName]);
   if (user) {
-    delete user.token;
+    await DB.updateUserRemoveAuth(user);
   }
   res.clearCookie(authCookieName);
   res.status(204).end();
@@ -55,7 +55,7 @@ apiRouter.delete('/auth/logout', async (req, res) => {
 
 // Middleware to verify that the user is authorized to call an endpoint
 const verifyAuth = async (req, res, next) => {
-  const user = await findUser('token', req.cookies[authCookieName]);
+  const user = await DB.getUserByToken(req.cookies[authCookieName]);
   if (user) {
     req.user = user;
     next();
@@ -75,10 +75,12 @@ apiRouter.get('/my/allergens', verifyAuth, (req, res) => {
 });
 
 // Replace my allergen list
-apiRouter.put('/my/allergens', verifyAuth, (req, res) => {
+apiRouter.put('/my/allergens', verifyAuth, async (req, res) => {
   req.user.allergens = req.body;
+  await DB.updateUser(req.user);
   res.send(req.user.allergens);
 });
+
 
 // Get my nutrition goals
 apiRouter.get('/my/goals', verifyAuth, (req, res) => {
@@ -86,10 +88,12 @@ apiRouter.get('/my/goals', verifyAuth, (req, res) => {
 });
 
 // Replace my nutrition goals
-apiRouter.put('/my/goals', verifyAuth, (req, res) => {
+apiRouter.put('/my/goals', verifyAuth, async (req, res) => {
   req.user.goals = req.body;
+  await DB.updateUser(req.user);
   res.send(req.user.goals);
 });
+
 
 // Food search proxy: search.openfoodfacts.org sends no CORS header, so
 // browsers can't read it directly — the server makes that one call.
@@ -106,12 +110,12 @@ apiRouter.get('/food/search', verifyAuth, async (req, res) => {
 });
 
 // Get the households I belong to
-apiRouter.get('/households', verifyAuth, (req, res) => {
-  res.send(households.filter((h) => h.members.includes(req.user.email)));
+apiRouter.get('/households', verifyAuth, async (req, res) => {
+  res.send(await DB.getHouseholds(req.user.email));
 });
 
 // Create a household
-apiRouter.post('/households', verifyAuth, (req, res) => {
+apiRouter.post('/households', verifyAuth, async (req, res) => {
   const household = {
     id: uuid.v4(),
     name: req.body.name,
@@ -119,26 +123,27 @@ apiRouter.post('/households', verifyAuth, (req, res) => {
     members: [req.user.email],
     recipes: [],
   };
-  households.push(household);
+  await DB.addHousehold(household);
   res.status(201).send(household);
 });
 
 // Join a household by invite code
-apiRouter.post('/households/join', verifyAuth, (req, res) => {
-  const household = households.find((h) => h.code === req.body.code);
+apiRouter.post('/households/join', verifyAuth, async (req, res) => {
+  const household = await DB.getHouseholdByCode(req.body.code);
   if (!household) {
     res.status(404).send({ msg: 'Household not found' });
     return;
   }
   if (!household.members.includes(req.user.email)) {
     household.members.push(req.user.email);
+    await DB.updateHousehold(household);
   }
   res.send(household);
 });
 
 // Find a household by id, but only if the user belongs to it
-function findMyHousehold(req) {
-  const household = households.find((h) => h.id === req.params.id);
+async function findMyHousehold(req) {
+  const household = await DB.getHouseholdById(req.params.id);
   if (!household || !household.members.includes(req.user.email)) {
     return null;
   }
@@ -146,8 +151,8 @@ function findMyHousehold(req) {
 }
 
 // Get a household's recipes
-apiRouter.get('/households/:id/recipes', verifyAuth, (req, res) => {
-  const household = findMyHousehold(req);
+apiRouter.get('/households/:id/recipes', verifyAuth, async (req, res) => {
+  const household = await findMyHousehold(req);
   if (!household) {
     res.status(403).send({ msg: 'Not a member of this household' });
     return;
@@ -156,8 +161,8 @@ apiRouter.get('/households/:id/recipes', verifyAuth, (req, res) => {
 });
 
 // Add a recipe to a household
-apiRouter.post('/households/:id/recipes', verifyAuth, (req, res) => {
-  const household = findMyHousehold(req);
+apiRouter.post('/households/:id/recipes', verifyAuth, async (req, res) => {
+  const household = await findMyHousehold(req);
   if (!household) {
     res.status(403).send({ msg: 'Not a member of this household' });
     return;
@@ -175,19 +180,22 @@ apiRouter.post('/households/:id/recipes', verifyAuth, (req, res) => {
   };
 
   household.recipes.push(recipe);
+  await DB.updateHousehold(household);
   res.status(201).send(recipe);
 });
 
 // Delete a recipe from a household
-apiRouter.delete('/households/:id/recipes/:recipeId', verifyAuth, (req, res) => {
-  const household = findMyHousehold(req);
+apiRouter.delete('/households/:id/recipes/:recipeId', verifyAuth, async (req, res) => {
+  const household = await findMyHousehold(req);
   if (!household) {
     res.status(403).send({ msg: 'Not a member of this household' });
     return;
   }
   household.recipes = household.recipes.filter((r) => r.id !== req.params.recipeId);
+  await DB.updateHousehold(household);
   res.status(204).end();
 });
+
 
 // Open Food Facts ingredients taxonomy: their maintained family tree
 // of ingredients (whey -> dairy, spice -> paprika, ...). Loaded once
@@ -206,7 +214,7 @@ fetch('https://static.openfoodfacts.org/data/taxonomies/ingredients.json')
       }
     }
   })
-  .catch(() => {
+  .catch((err) => {
     console.error('Failed to load the Open Food Facts taxonomy:', err.message);
     taxonomy = null;
   });
@@ -311,15 +319,9 @@ async function createUser(email, password) {
     allergens: [],
     goals: []
   };
-  users.push(user);
+  await DB.addUser(user);
 
   return user;
-}
-
-async function findUser(field, value) {
-  if (!value) return null;
-
-  return users.find((u) => u[field] === value);
 }
 
 // setAuthCookie in the HTTP response
