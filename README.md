@@ -154,9 +154,10 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 
 For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
 
-- [ ] I completed the prerequisites for this deliverable (Simon deployed, GitHub link, Git commits)
-- [ ] **Stores data in MongoDB** - I did not complete this part of the deliverable.
-- [ ] **Stores credentials in MongoDB** - I did not complete this part of the deliverable.
+- [x] I completed the prerequisites for this deliverable (Simon deployed, GitHub link, Git commits) - Simon DB is deployed at simon.burkart260webprogramming.click with its scores and users stored in MongoDB Atlas, the GitHub link is on the startup application's home page, and the database work was committed to GitHub in multiple commits.
+- [x] **Stores data in MongoDB** - The startup service stores its application data in MongoDB Atlas. service/database.js connects with the mongodb driver using the credentials in dbConfig.json (kept out of Git and carried to the server by deployService.sh), and service/index.js reads and writes households and their recipes, along with each user's allergens and nutrition goals, through that module instead of in-memory arrays. I verified it locally by registering an account, adding an allergen, and letting the dashboard create a household, then restarting the service and confirming everything was still there, and verified it again after deploying to production.
+- [x] **Stores credentials in MongoDB** - User credentials are stored in the MongoDB user collection. Registration inserts a user document with the email, a bcrypt-hashed password, and an auth token; login reads the document, checks the password, and saves a new token back to it; logout removes the token from the document so the old cookie no longer authenticates.
+
 
 ## 🚀 WebSocket deliverable
 
