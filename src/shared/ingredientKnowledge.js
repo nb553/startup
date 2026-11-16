@@ -172,13 +172,14 @@ export function getIngredientFlags(rawName, extra = {}) {
     matchedKey = candidates[0] || null;
   }
   const entry = matchedKey ? ingredientKnowledge[matchedKey] : null;
+  const members = extra.members || householdMembers;
 
   const ancestors = (extra.ancestors || []).map((a) => a.toLowerCase());
   const strongKeys = [key, ...ancestors];
   if (matchedKey) strongKeys.push(matchedKey);
   if (entry) strongKeys.push(...(entry.partOf || []), ...(entry.contains || []));
   const texts = [key, ...ancestors];
-  for (const member of householdMembers) {
+  for (const member of members) {
     for (const term of [...member.severe, ...member.caution]) {
       const expanded = termExpansions[term] || [];
       if (
@@ -196,14 +197,14 @@ export function getIngredientFlags(rawName, extra = {}) {
     return { key, entry, severe: [], caution: [], check: entry.checkFor || [] };
   }
   if (entry && entry.match === 'derived') {
-    const check = householdMembers
+    const check = members
       .filter((m) => hits(m.severe) || hits(m.caution))
       .map((m) => m.name);
     return { key, entry, severe: [], caution: [], check };
   }
 
-  const severe = householdMembers.filter((m) => hits(m.severe)).map((m) => m.name);
-  const caution = householdMembers.filter((m) => hits(m.caution)).map((m) => m.name);
+  const severe = members.filter((m) => hits(m.severe)).map((m) => m.name);
+  const caution = members.filter((m) => hits(m.caution)).map((m) => m.name);
 
   const words = (s) =>
     s.toLowerCase().replace(/s\b/g, '').split(/[^a-z]+/).filter((w) => w.length >= 3);
@@ -216,7 +217,7 @@ export function getIngredientFlags(rawName, extra = {}) {
   };
   const checkSet = new Set();
   const isVague = vagueTerms.some((v) => key === v || key.startsWith(v));
-  for (const member of householdMembers) {
+  for (const member of members) {
     if (severe.includes(member.name) || caution.includes(member.name)) continue;
     const memberTerms = [...member.severe, ...member.caution];
     if (memberTerms.some((t) => looseMatch(t))) checkSet.add(member.name);
@@ -226,4 +227,3 @@ export function getIngredientFlags(rawName, extra = {}) {
 
   return { key, entry, severe, caution, check: [...checkSet] };
 }
-

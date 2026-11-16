@@ -19,6 +19,10 @@ app.use(`/api`, apiRouter);
 
 // CreateAuth: register a new user
 apiRouter.post('/auth/create', async (req, res) => {
+  if (!req.body.email || !req.body.password) {
+    res.status(400).send({ msg: 'Email and password are required' });
+    return;
+  }
   if (await DB.getUser(req.body.email)) {
     res.status(409).send({ msg: 'Existing user' });
   } else {
@@ -30,6 +34,10 @@ apiRouter.post('/auth/create', async (req, res) => {
 
 // GetAuth: login an existing user
 apiRouter.post('/auth/login', async (req, res) => {
+  if (!req.body.email || !req.body.password) {
+    res.status(400).send({ msg: 'Email and password are required' });
+    return;
+  } 
   const user = await DB.getUser(req.body.email);
   if (user) {
     if (await bcrypt.compare(req.body.password, user.password)) {
@@ -149,6 +157,21 @@ async function findMyHousehold(req) {
   }
   return household;
 }
+
+// Get the allergen lists of everyone in a household I belong to
+apiRouter.get('/households/:id/allergens', verifyAuth, async (req, res) => {
+  const household = await findMyHousehold(req);
+  if (!household) {
+    res.status(403).send({ msg: 'Not a member of this household' });
+    return;
+  }
+  const members = [];
+  for (const email of household.members) {
+    const user = await DB.getUser(email);
+    members.push({ email: email, allergens: user ? user.allergens : [] });
+  }
+  res.send(members);
+});
 
 // Get a household's recipes
 apiRouter.get('/households/:id/recipes', verifyAuth, async (req, res) => {

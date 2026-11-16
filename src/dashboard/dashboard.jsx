@@ -44,14 +44,14 @@ const activityMessagePool = [
   { who: 'Natasha', text: 'updated her allergen list.' },
 ];
 
-function RecipeCard({ recipe }) {
+function RecipeCard({ recipe, members }) {
   return (
     <article className="card flex flex-col gap-2">
       <h4 className="font-bold">{recipe.name}</h4>
       {recipe.image && <img src={recipe.image} alt={recipe.name} className="rounded w-full h-40 object-cover" />}
       <ul className="list-disc list-inside">
         {recipe.ingredients.map((name, i) => {
-          const flags = getIngredientFlags(name);
+          const flags = getIngredientFlags(name, { members});
           const severeFor = flags.severe.join(', ');
           const cautionFor = flags.caution.join(', ');
           const checkFor = flags.check.join(', ');
@@ -104,6 +104,7 @@ function RecipeCard({ recipe }) {
 export function Dashboard({ userName }) {
   const [recipes, setRecipes] = useState([]);
   const [household, setHousehold] = useState(null);
+  const [flagMembers, setFlagMembers] = useState([]);
 
   // Recipes live on the service now: load my households and use the
   // first one's recipes. A first visit creates the household and
@@ -131,15 +132,33 @@ export function Dashboard({ userName }) {
           }
           mine = [created];
         }
-        setHousehold(mine[0]);
-        const recipesRes = await fetch(`/api/households/${mine[0].id}/recipes`);
-        if (recipesRes.ok) setRecipes(await recipesRes.json());
-      } catch {
-        // Service unreachable — the board stays empty rather than crashing.
+              setHousehold(mine[0]);
+      const recipesRes = await fetch(`/api/households/${mine[0].id}/recipes`);
+      if (recipesRes.ok) setRecipes(await recipesRes.json());
+      const allergensRes = await fetch(`/api/households/${mine[0].id}/allergens`);
+      if (allergensRes.ok) {
+        const memberAllergens = await allergensRes.json();
+        const meRes = await fetch('/api/user/me');
+        const me = meRes.ok ? await meRes.json() : null;
+        setFlagMembers(
+          memberAllergens.map((m) => ({
+            name: me && m.email === me.email && userName ? userName : m.email,
+            severe: m.allergens
+              .filter((a) => a.level === 'Severe allergy')
+              .map((a) => a.name.toLowerCase()),
+            caution: m.allergens
+              .filter((a) => a.level === 'Intolerance')
+              .map((a) => a.name.toLowerCase()),
+          }))
+        );
       }
+    } catch {
+      // Service unreachable — the board stays empty rather than crashing.
     }
-    load();
-  }, []);
+  }
+  load();
+}, []);
+
 
   const [recipeName, setRecipeName] = useState('');
   const [recipeIngredients, setRecipeIngredients] = useState('');
@@ -218,7 +237,7 @@ export function Dashboard({ userName }) {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {recipes.map((recipe) => (
-            <RecipeCard key={recipe.id} recipe={recipe} />
+            <RecipeCard key={recipe.id} recipe={recipe} members={flagMembers} />
           ))}
 
           <article className="card flex flex-col gap-3">
